@@ -39,7 +39,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-public class BetterDocsWindow implements ToolWindowFactory {
+public class MainWindow implements ToolWindowFactory {
 
     private static final String PREF_PREF_GROW = "pref, pref:grow";
     private static final String PREF_PREF = "pref";
@@ -58,7 +58,7 @@ public class BetterDocsWindow implements ToolWindowFactory {
         Document document = EditorFactory.getInstance().createDocument("");
         Editor windowEditor = EditorFactory.getInstance().createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension("java"), false);
 
-        BetterDocsAction action = new BetterDocsAction();
+        RefreshAction action = new RefreshAction();
         action.setTree(jTree);
         action.setWindowEditor(windowEditor);
 
