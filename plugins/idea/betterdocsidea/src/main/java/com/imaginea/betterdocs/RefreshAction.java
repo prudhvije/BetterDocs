@@ -48,13 +48,13 @@ public class RefreshAction extends AnAction {
     public static final int DISTANCE_DEFAULT_VALUE = 10;
     public static final int SIZE_DEFAULT_VALUE = 30;
 
-    public static Project project;
-    public static JTree jTree;
-    public static Editor windowEditor;
+    static Project project;
+    static JTree jTree;
+    static Editor windowEditor;
 
-    public static int distance;
-    public static int size;
-    public static String esURL;
+    static int distance;
+    static int size;
+    static String esURL;
 
     public void setWindowEditor(Editor windowEditor) {
         this.windowEditor = windowEditor;
