@@ -27,7 +27,8 @@ import org.jetbrains.annotations.NotNull;
 public class WindowEditorOps {
     private static WindowObjects windowObjects = WindowObjects.getInstance();
 
-    public void addFoldings(final Document windowEditorDocument, final Iterable<Integer> linesForFolding) {
+    public final void addFoldings(final Document windowEditorDocument,
+                                  final Iterable<Integer> linesForFolding) {
         final Editor windowEditor = windowObjects.getWindowEditor();
         windowEditor.getFoldingModel().runBatchFoldingOperation(new Runnable() {
             @Override
@@ -55,19 +56,19 @@ public class WindowEditorOps {
         });
     }
 
-    public void writeToDocument(final CodeInfo codeInfo, final Document windowEditorDocument) {
+    public final void writeToDocument(final CodeInfo codeInfo,
+                                      final Document windowEditorDocument) {
         new WriteCommandAction(windowObjects.getProject()) {
             @Override
-            protected void run(@NotNull Result result) throws Throwable {
+            protected void run(@NotNull final Result result) throws Throwable {
                 windowEditorDocument.setReadOnly(false);
                 windowEditorDocument.setText(codeInfo.getContents());
                 windowEditorDocument.setReadOnly(true);
             }
-        }.execute();
-
+        } .execute();
     }
 
-    protected void cleanFoldingRegions(Editor windowEditor) {
+    protected final void cleanFoldingRegions(final Editor windowEditor) {
         FoldRegion[] foldRegions = windowEditor.getFoldingModel().getAllFoldRegions();
         for (FoldRegion currentRegion : foldRegions) {
             windowEditor.getFoldingModel().removeFoldRegion(currentRegion);

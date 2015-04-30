@@ -26,7 +26,8 @@ public class EditorDocOps {
     private static final String IMPORT = "import ";
     public static final char DOT = '.';
 
-    public Set<String> importsInLines(Iterable<String> lines, Iterable<String> imports) {
+    public final Set<String> importsInLines(final Iterable<String> lines,
+                                            final Iterable<String> imports) {
         Set<String> importsInLines = new HashSet<String>();
 
         for (String line : lines) {
@@ -39,23 +40,31 @@ public class EditorDocOps {
         return importsInLines;
     }
 
-    public Set<String> getLines(Editor projectEditor, int distance) {
+    public final Set<String> getLines(final Editor projectEditor, final int distance) {
         Set<String> lines = new HashSet<String>();
         Document document = projectEditor.getDocument();
-        int head;
-        int tail;
+        int head = 0;
+        int tail = document.getLineCount() - 1;
 
         if (projectEditor.getSelectionModel().hasSelection()) {
             head = document.getLineNumber(projectEditor.getSelectionModel().getSelectionStart());
             tail = document.getLineNumber(projectEditor.getSelectionModel().getSelectionEnd());
         } else {
             int currentLine = document.getLineNumber(projectEditor.getCaretModel().getOffset());
-            head = currentLine - distance >= 0 ? currentLine - distance : 0;
-            tail = currentLine + distance <= document.getLineCount() - 1 ? currentLine + distance : document.getLineCount() - 1;
+
+            if (currentLine - distance >= 0) {
+                head = currentLine - distance;
+            }
+
+            if (currentLine + distance <= document.getLineCount() - 1) {
+                tail = currentLine + distance;
+            }
         }
 
         for (int j = head; j <= tail; j++) {
-            String line = document.getCharsSequence().subSequence(document.getLineStartOffset(j), document.getLineEndOffset(j)).toString();
+            String line = document.getCharsSequence().
+                                    subSequence(document.getLineStartOffset(j),
+                                                    document.getLineEndOffset(j)).toString();
             if (!line.contains(IMPORT)) {
                 lines.add(line);
             }
@@ -63,12 +72,15 @@ public class EditorDocOps {
         return lines;
     }
 
-    public Set<String> getImports(Document document) {
+    public final Set<String> getImports(final Document document) {
         int startLine = 0;
         int endLine = document.getLineCount() - 1;
         Set<String> imports = new HashSet<String>();
         for (int i = startLine; i <= endLine; i++) {
-            String line = document.getCharsSequence().subSequence(document.getLineStartOffset(i), document.getLineEndOffset(i) + document.getLineSeparatorLength(i)).toString();
+            int lineStart = document.getLineStartOffset(i);
+            int lineEnd = document.getLineEndOffset(i) + document.getLineSeparatorLength(i);
+            String line = document.getCharsSequence().
+                                    subSequence(lineStart, lineEnd).toString();
             if (line.contains(IMPORT) && !line.contains("*")) {
                 imports.add(line.replace(IMPORT, "").replace(";", "").trim());
             }

@@ -59,11 +59,12 @@ public class RefreshAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+    public final void actionPerformed(@NotNull final AnActionEvent anActionEvent) {
         windowObjects.setProject(anActionEvent.getProject());
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
 
-        windowObjects.setDistance(propertiesComponent.getOrInitInt(DISTANCE, DISTANCE_DEFAULT_VALUE));
+        windowObjects.setDistance(propertiesComponent.
+                                    getOrInitInt(DISTANCE, DISTANCE_DEFAULT_VALUE));
         windowObjects.setSize(propertiesComponent.getOrInitInt(SIZE, SIZE_DEFAULT_VALUE));
         windowObjects.setEsURL(propertiesComponent.getValue(ES_URL, ES_URL_DEFAULT));
 
@@ -74,7 +75,7 @@ public class RefreshAction extends AnAction {
         }
     }
 
-    public void runAction(final AnActionEvent anActionEvent) throws IOException {
+    public final void runAction(final AnActionEvent anActionEvent) throws IOException {
         Project project = windowObjects.getProject();
         final Editor projectEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
@@ -91,18 +92,21 @@ public class RefreshAction extends AnAction {
             jTree.setVisible(true);
 
             if (!importsInLines.isEmpty()) {
-                String esQueryJson = jsonUtils.getESQueryJson(importsInLines, windowObjects.getSize());
-                String esResultJson = esUtils.getESResultJson(esQueryJson, windowObjects.getEsURL() + BETTERDOCS_SEARCH);
+                String esQueryJson = jsonUtils.getESQueryJson(importsInLines,
+                                        windowObjects.getSize());
+                String esResultJson = esUtils.getESResultJson(esQueryJson,
+                                        windowObjects.getEsURL() + BETTERDOCS_SEARCH);
 
                 if (!esResultJson.equals(EMPTY_ES_URL)) {
                     Map<String, String> fileTokensMap = esUtils.getFileTokens(esResultJson);
-                    Map<String, ArrayList<CodeInfo>> projectNodes = new HashMap<String, ArrayList<CodeInfo>>();
+                    Map<String, ArrayList<CodeInfo>> projectNodes =
+                                    new HashMap<String, ArrayList<CodeInfo>>();
 
                     projectTree.updateProjectNodes(imports, fileTokensMap, projectNodes);
                     projectTree.updateRoot(root, projectNodes);
 
                     model.reload(root);
-                    jTree.addTreeSelectionListener(new ProjectTree().getTreeSelectionListener(root));
+                    jTree.addTreeSelectionListener(projectTree.getTreeSelectionListener(root));
                 } else {
                     Messages.showInfoMessage(EMPTY_ES_URL, INFO);
                 }

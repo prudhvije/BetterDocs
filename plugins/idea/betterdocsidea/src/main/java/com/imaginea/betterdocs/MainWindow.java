@@ -28,11 +28,9 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -48,17 +46,18 @@ public class MainWindow implements ToolWindowFactory, Disposable {
     private Editor windowEditor;
 
     @Override
-    public void createToolWindowContent(Project project, ToolWindow toolWindow) {
+    public final void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
         toolWindow.setIcon(AllIcons.Toolwindows.Documentation);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(PROJECTS);
 
         JTree jTree = new JTree(root);
         jTree.setVisible(false);
         jTree.setAutoscrolls(true);
-        jTree.setForeground(new JBColor(new Color(100, 155, 155), new Color(100, 155, 155)));
 
         Document document = EditorFactory.getInstance().createDocument("");
-        windowEditor = EditorFactory.getInstance().createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension("java"), false);
+        windowEditor = EditorFactory.getInstance().
+                        createEditor(document, project, FileTypeManager.getInstance().
+                                getFileTypeByExtension("java"), false);
 
         RefreshAction action = new RefreshAction();
         WindowObjects windowObjects = WindowObjects.getInstance();
@@ -68,11 +67,9 @@ public class MainWindow implements ToolWindowFactory, Disposable {
 
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(action);
-        JComponent toolBar = ActionManager.getInstance().createActionToolbar("BetterDocs", group, true).getComponent();
-
-        EditorToggleAction toggleAction = new EditorToggleAction();
-        DefaultActionGroup moveGroup = new DefaultActionGroup();
-        moveGroup.add(toggleAction);
+        JComponent toolBar = ActionManager.getInstance().
+                                            createActionToolbar("BetterDocs", group, true).
+                                            getComponent();
 
         FormLayout layout = new FormLayout(
                 PREF_PREF_GROW,
@@ -83,7 +80,6 @@ public class MainWindow implements ToolWindowFactory, Disposable {
         JBScrollPane jTreeScrollPane = new JBScrollPane();
         jTreeScrollPane.setViewportView(jTree);
         jTreeScrollPane.setAutoscrolls(true);
-        jTreeScrollPane.setBackground(new Color(255, 0, 0));
         jTreeScrollPane.setPreferredSize(new Dimension(200, 300));
 
         JPanel jPanel = new JPanel(layout);
@@ -96,13 +92,12 @@ public class MainWindow implements ToolWindowFactory, Disposable {
 
         final JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, jbScrollPane, jPanel);
         jSplitPane.setDividerLocation(0.5);
-        toggleAction.setjSplitPane(jSplitPane);
 
         toolWindow.getComponent().getParent().add(jSplitPane);
     }
 
     @Override
-    public void dispose() {
+    public final void dispose() {
         if (windowEditor != null) {
             EditorFactory.getInstance().releaseEditor(windowEditor);
         }

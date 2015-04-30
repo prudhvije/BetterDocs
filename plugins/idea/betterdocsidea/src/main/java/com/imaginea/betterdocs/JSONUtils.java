@@ -35,7 +35,7 @@ public class JSONUtils {
     private static final String LINE_NUMBERS = "lineNumbers";
     private static final String SORT_ORDER = "desc";
 
-    public String getJsonForFileContent(String fileName) {
+    public final String getJsonForFileContent(final String fileName) {
         ESFileContent esFileContent = new ESFileContent();
         ESFileContent.Query query = new ESFileContent.Query();
         esFileContent.setQuery(query);
@@ -46,7 +46,7 @@ public class JSONUtils {
         return gson.toJson(esFileContent);
     }
 
-    public String getESQueryJson(Set<String> importsInLines, int size) {
+    public final String getESQueryJson(final Set<String> importsInLines, final int size) {
         ESQuery esQuery = new ESQuery();
         ESQuery.Query query = new ESQuery.Query();
         esQuery.setQuery(query);
@@ -88,7 +88,8 @@ public class JSONUtils {
         return gson.toJson(esQuery).replaceAll(IMPORT_NAME, CUSTOM_TOKENS_IMPORT_NAME);
     }
 
-    public List<Integer> getLineNumbers(Collection<String> imports, String tokens) {
+    public final List<Integer> getLineNumbers(final Collection<String> imports,
+                                              final String tokens) {
         List<Integer> lineNumbers = new ArrayList<Integer>();
         JsonReader reader = new JsonReader(new StringReader(tokens));
         reader.setLenient(true);

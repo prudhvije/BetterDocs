@@ -35,7 +35,7 @@ public class WindowObjects {
 
     }
 
-    public void setProject(Project project) {
+    public void setProject(final Project project) {
         this.project = project;
     }
 
@@ -43,7 +43,7 @@ public class WindowObjects {
         return project;
     }
 
-    public void setTree(JTree jTree) {
+    public void setTree(final JTree jTree) {
         this.jTree = jTree;
     }
 
@@ -51,7 +51,7 @@ public class WindowObjects {
         return jTree;
     }
 
-    public void setWindowEditor(Editor windowEditor) {
+    public void setWindowEditor(final Editor windowEditor) {
         this.windowEditor = windowEditor;
     }
 
@@ -59,7 +59,7 @@ public class WindowObjects {
         return windowEditor;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(final int distance) {
         this.distance = distance;
     }
 
@@ -67,7 +67,7 @@ public class WindowObjects {
         return distance;
     }
 
-    public void setSize(int size) {
+    public void setSize(final int size) {
         this.size = size;
     }
 
@@ -75,7 +75,7 @@ public class WindowObjects {
         return size;
     }
 
-    public void setEsURL(String esURL) {
+    public void setEsURL(final String esURL) {
         this.esURL = esURL;
     }
 

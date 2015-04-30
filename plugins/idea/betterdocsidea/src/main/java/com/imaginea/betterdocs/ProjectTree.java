@@ -36,16 +36,17 @@ public class ProjectTree {
     private ESUtils esUtils = new ESUtils();
     private JSONUtils jsonUtils = new JSONUtils();
 
-    public TreeSelectionListener getTreeSelectionListener(final TreeNode root) {
+    public final TreeSelectionListener getTreeSelectionListener(final TreeNode root) {
         return new TreeSelectionListener() {
             @Override
-            public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
+            public void valueChanged(final TreeSelectionEvent treeSelectionEvent) {
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)
                         windowObjects.getjTree().getLastSelectedPathComponent();
 
                 if (selectedNode != null && selectedNode.isLeaf() && root.getChildCount() > 0) {
                     final CodeInfo codeInfo = (CodeInfo) selectedNode.getUserObject();
-                    final Document windowEditorDocument = windowObjects.getWindowEditor().getDocument();
+                    final Document windowEditorDocument = windowObjects.getWindowEditor().
+                                                                        getDocument();
 
                     windowEditorOps.writeToDocument(codeInfo, windowEditorDocument);
 
@@ -58,7 +59,9 @@ public class ProjectTree {
         };
     }
 
-    public void updateProjectNodes(Collection<String> imports, Map<String, String> fileTokensMap, Map<String, ArrayList<CodeInfo>> projectNodes) {
+    public final void updateProjectNodes(final Collection<String> imports,
+                                         final Map<String, String> fileTokensMap,
+                                         final Map<String, ArrayList<CodeInfo>> projectNodes) {
         for (Map.Entry<String, String> entry : fileTokensMap.entrySet()) {
             String fileName = entry.getKey();
             String tokens = entry.getValue();
@@ -76,19 +79,23 @@ public class ProjectTree {
             if (projectNodes.containsKey(projectName)) {
                 projectNodes.get(projectName).add(codeInfo);
             } else {
-                projectNodes.put(projectName, new ArrayList<CodeInfo>(Collections.singletonList(codeInfo)));
+                projectNodes.put(projectName,
+                                    new ArrayList<CodeInfo>(Collections.singletonList(codeInfo)));
             }
         }
     }
 
-    public DefaultMutableTreeNode updateRoot(DefaultMutableTreeNode root, Map<String, ArrayList<CodeInfo>> projectNodes) {
+    public final DefaultMutableTreeNode updateRoot(final DefaultMutableTreeNode root,
+                                                   final  Map<String,
+                                                           ArrayList<CodeInfo>> projectNodes) {
         for (Map.Entry<String, ArrayList<CodeInfo>> entry : projectNodes.entrySet()) {
             root.add(this.getNodes(entry.getKey(), entry.getValue()));
         }
         return root;
     }
 
-    protected MutableTreeNode getNodes(String projectName, Iterable<CodeInfo> codeInfoCollection) {
+    protected final MutableTreeNode getNodes(final String projectName,
+                                             final Iterable<CodeInfo> codeInfoCollection) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(projectName);
         Collection<String> fileNameSet = new HashSet<String>();
         for (CodeInfo codeInfo : codeInfoCollection) {

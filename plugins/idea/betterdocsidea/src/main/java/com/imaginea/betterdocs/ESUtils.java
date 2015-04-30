@@ -50,19 +50,21 @@ public class ESUtils {
     private static WindowObjects windowObjects = WindowObjects.getInstance();
     private JSONUtils jsonUtils = new JSONUtils();
 
-    public String getContentsForFile(String file) {
+    public final String getContentsForFile(final String file) {
         String esFileQueryJson = jsonUtils.getJsonForFileContent(file);
-        String esFileResultJson = getESResultJson(esFileQueryJson, windowObjects.getEsURL() + SOURCEFILE_SEARCH);
+        String esFileResultJson = getESResultJson(esFileQueryJson,
+                                    windowObjects.getEsURL() + SOURCEFILE_SEARCH);
         JsonArray hitsArray = getJsonElements(esFileResultJson);
 
         JsonObject hitObject = hitsArray.get(0).getAsJsonObject();
         JsonObject sourceObject = hitObject.getAsJsonObject(SOURCE);
         //Replacing \r as it's treated as bad end of line character
-        String fileContent = sourceObject.getAsJsonPrimitive(FILE_CONTENT).getAsString().replaceAll("\r", "");
+        String fileContent = sourceObject.getAsJsonPrimitive(FILE_CONTENT).
+                                getAsString().replaceAll("\r", "");
         return fileContent;
     }
 
-    public Map<String, String> getFileTokens(String esResultJson) {
+    public final Map<String, String> getFileTokens(final String esResultJson) {
         Map<String, String> fileTokenMap = new HashMap<String, String>();
         JsonArray hitsArray = getJsonElements(esResultJson);
 
@@ -76,7 +78,7 @@ public class ESUtils {
         return fileTokenMap;
     }
 
-    protected JsonArray getJsonElements(String esResultJson) {
+    protected final JsonArray getJsonElements(final String esResultJson) {
         JsonReader reader = new JsonReader(new StringReader(esResultJson));
         reader.setLenient(true);
         JsonElement jsonElement = new JsonParser().parse(reader);
@@ -86,7 +88,7 @@ public class ESUtils {
     }
 
 
-    public String getESResultJson(String esQueryJson, String url) {
+    public final String getESResultJson(final String esQueryJson, final String url) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             HttpClient httpClient = new DefaultHttpClient();
@@ -98,8 +100,8 @@ public class ESUtils {
 
             HttpResponse response = httpClient.execute(getRequest);
             if (response.getStatusLine().getStatusCode() != 200) {
-                throw new RuntimeException(FAILED_HTTP_ERROR_CODE + url +
-                        response.getStatusLine().getStatusCode());
+                throw new RuntimeException(FAILED_HTTP_ERROR_CODE + url
+                        + response.getStatusLine().getStatusCode());
             }
 
             BufferedReader bufferedReader = new BufferedReader(

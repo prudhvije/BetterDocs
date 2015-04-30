@@ -25,30 +25,30 @@ public class ESQuery {
     private int size;
     private List<Sort> sort;
 
-    public Query getQuery() {
+    public final Query getQuery() {
         return query;
     }
 
-    public int getFrom() {
+    public final int getFrom() {
         return from;
     }
 
-    public int getSize() {
+    public final int getSize() {
         return size;
     }
 
-    public List<Sort> getSort() {
+    public final List<Sort> getSort() {
         return sort;
     }
 
     public static class Query {
         private Bool bool;
 
-        public void setBool(Bool bool) {
+        public final void setBool(final Bool bool) {
             this.bool = bool;
         }
 
-        public Bool getBool() {
+        public final Bool getBool() {
             return bool;
         }
     }
@@ -58,27 +58,27 @@ public class ESQuery {
         private List<Must> mustNot;
         private List<Must> should;
 
-        public void setMust(List<Must> must) {
+        public final void setMust(final List<Must> must) {
             this.must = must;
         }
 
-        public void setMustNot(List<Must> mustNot) {
+        public final void setMustNot(final List<Must> mustNot) {
             this.mustNot = mustNot;
         }
 
-        public void setShould(List<Must> should) {
+        public final void setShould(final List<Must> should) {
             this.should = should;
         }
 
-        public List<Must> getMust() {
+        public final List<Must> getMust() {
             return must;
         }
 
-        public List<Must> getMustNot() {
+        public final List<Must> getMustNot() {
             return mustNot;
         }
 
-        public List<Must> getShould() {
+        public final List<Must> getShould() {
             return should;
         }
     }
@@ -86,11 +86,11 @@ public class ESQuery {
     public static class Must {
         private Term term;
 
-        public void setTerm(Term term) {
+        public final void setTerm(final Term term) {
             this.term = term;
         }
 
-        public Term getTerm() {
+        public final Term getTerm() {
             return term;
         }
     }
@@ -98,11 +98,11 @@ public class ESQuery {
     public static class Term {
         private String importName;
 
-        public void setImportName(String importName) {
+        public final void setImportName(final String importName) {
             this.importName = importName;
         }
 
-        public String getImportName() {
+        public final String getImportName() {
             return importName;
         }
     }
@@ -110,11 +110,11 @@ public class ESQuery {
     public static class Sort {
         private Score score;
 
-        public void setScore(Score score) {
+        public final void setScore(final Score score) {
             this.score = score;
         }
 
-        public Score getScore() {
+        public final Score getScore() {
             return score;
         }
     }
@@ -122,28 +122,28 @@ public class ESQuery {
     public static class Score {
         private String order;
 
-        public void setOrder(String order) {
+        public final void setOrder(final String order) {
             this.order = order;
         }
 
-        public String getOrder() {
+        public final String getOrder() {
             return order;
         }
     }
 
-    public void setQuery(Query query) {
+    public final void setQuery(final Query query) {
         this.query = query;
     }
 
-    public void setFrom(int from) {
+    public final void setFrom(final int from) {
         this.from = from;
     }
 
-    public void setSize(int size) {
+    public final void setSize(final int size) {
         this.size = size;
     }
 
-    public void setSort(List<Sort> sort) {
+    public final void setSort(final List<Sort> sort) {
         this.sort = sort;
     }
 }
