@@ -25,8 +25,10 @@ import com.intellij.openapi.editor.FoldRegion;
 import org.jetbrains.annotations.NotNull;
 
 public class WindowEditorOps {
-    public static void addFoldings(final Document windowEditorDocument, final Iterable<Integer> linesForFolding) {
-        final Editor windowEditor = RefreshAction.windowEditor;
+    private static WindowObjects windowObjects = WindowObjects.getInstance();
+
+    public void addFoldings(final Document windowEditorDocument, final Iterable<Integer> linesForFolding) {
+        final Editor windowEditor = windowObjects.getWindowEditor();
         windowEditor.getFoldingModel().runBatchFoldingOperation(new Runnable() {
             @Override
             public void run() {
@@ -53,8 +55,8 @@ public class WindowEditorOps {
         });
     }
 
-    public static void writeToDocument(final CodeInfo codeInfo, final Document windowEditorDocument) {
-        new WriteCommandAction(RefreshAction.project) {
+    public void writeToDocument(final CodeInfo codeInfo, final Document windowEditorDocument) {
+        new WriteCommandAction(windowObjects.getProject()) {
             @Override
             protected void run(@NotNull Result result) throws Throwable {
                 windowEditorDocument.setReadOnly(false);
@@ -65,8 +67,7 @@ public class WindowEditorOps {
 
     }
 
-
-    private static void cleanFoldingRegions(Editor windowEditor) {
+    protected void cleanFoldingRegions(Editor windowEditor) {
         FoldRegion[] foldRegions = windowEditor.getFoldingModel().getAllFoldRegions();
         for (FoldRegion currentRegion : foldRegions) {
             windowEditor.getFoldingModel().removeFoldRegion(currentRegion);

@@ -21,8 +21,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import java.io.IOException;
@@ -37,32 +37,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class RefreshAction extends AnAction {
     private static final String BETTER_DOCS = "BetterDocs";
-    private static final String ILLEGAL_FORMAT = "Please Provide valid numbers for distance and size in settings. Using default values for now";
-    private static final String INFO = "Info";
-    public static final String EMPTY_ES_URL = "Please set/modify proper esURL in idea settings";
-    public static final String ES_URL = "esURL";
-    public static final String DISTANCE = "distance";
-    public static final String SIZE = "size";
+    protected static final String EMPTY_ES_URL = "Please set/modify proper esURL in idea settings";
+    protected static final String ES_URL = "esURL";
+    protected static final String DISTANCE = "distance";
+    protected static final String SIZE = "size";
     private static final String BETTERDOCS_SEARCH = "/betterdocs/_search?source=";
-    public static final String ES_URL_DEFAULT = "http://labs.imaginea.com/betterdocs";
-    public static final int DISTANCE_DEFAULT_VALUE = 10;
-    public static final int SIZE_DEFAULT_VALUE = 30;
+    protected static final String ES_URL_DEFAULT = "http://labs.imaginea.com/betterdocs";
+    protected static final int DISTANCE_DEFAULT_VALUE = 10;
+    protected static final int SIZE_DEFAULT_VALUE = 30;
+    private static final String EDITOR_ERROR = "Could not get editor any active editor";
+    private static final String INFO = "info";
 
-    static Project project;
-    static JTree jTree;
-    static Editor windowEditor;
-
-    static int distance;
-    static int size;
-    static String esURL;
-
-    public void setWindowEditor(Editor windowEditor) {
-        this.windowEditor = windowEditor;
-    }
-
-    public void setTree(JTree jTree) {
-        this.jTree = jTree;
-    }
+    private WindowObjects windowObjects = WindowObjects.getInstance();
+    private ProjectTree projectTree = new ProjectTree();
+    private EditorDocOps editorDocOps = new EditorDocOps();
+    private ESUtils esUtils = new ESUtils();
+    private JSONUtils jsonUtils = new JSONUtils();
 
     public RefreshAction() {
         super(BETTER_DOCS, BETTER_DOCS, AllIcons.Actions.Refresh);
@@ -70,17 +60,12 @@ public class RefreshAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-        setProject(anActionEvent.getProject());
+        windowObjects.setProject(anActionEvent.getProject());
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        try {
-            this.distance = propertiesComponent.getOrInitInt(DISTANCE, DISTANCE_DEFAULT_VALUE);
-            this.size = propertiesComponent.getOrInitInt(SIZE, SIZE_DEFAULT_VALUE);
-            this.esURL = propertiesComponent.getValue(ES_URL, ES_URL_DEFAULT);
-        } catch (NumberFormatException ne) {
-            this.distance = DISTANCE_DEFAULT_VALUE;
-            this.size = SIZE_DEFAULT_VALUE;
-            Messages.showInfoMessage(String.format(ILLEGAL_FORMAT), INFO);
-        }
+
+        windowObjects.setDistance(propertiesComponent.getOrInitInt(DISTANCE, DISTANCE_DEFAULT_VALUE));
+        windowObjects.setSize(propertiesComponent.getOrInitInt(SIZE, SIZE_DEFAULT_VALUE));
+        windowObjects.setEsURL(propertiesComponent.getValue(ES_URL, ES_URL_DEFAULT));
 
         try {
             runAction(anActionEvent);
@@ -89,43 +74,43 @@ public class RefreshAction extends AnAction {
         }
     }
 
-    public void runAction(final AnActionEvent e) throws IOException {
-        final Editor projectEditor = DataKeys.EDITOR.getData(e.getDataContext());
+    public void runAction(final AnActionEvent anActionEvent) throws IOException {
+        Project project = windowObjects.getProject();
+        final Editor projectEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
 
         if (projectEditor != null) {
+            JTree jTree = windowObjects.getjTree();
 
-            Set<String> imports = EditorDocOps.getImports(projectEditor.getDocument());
-            Set<String> lines = EditorDocOps.getLines(projectEditor);
-            Set<String> importsInLines = EditorDocOps.importsInLines(lines, imports);
+            Set<String> imports = editorDocOps.getImports(projectEditor.getDocument());
+            Set<String> lines = editorDocOps.getLines(projectEditor, windowObjects.getDistance());
+            Set<String> importsInLines = editorDocOps.importsInLines(lines, imports);
 
             DefaultTreeModel model = (DefaultTreeModel) jTree.getModel();
             DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
             root.removeAllChildren();
+            jTree.setVisible(true);
 
             if (!importsInLines.isEmpty()) {
-                jTree.setVisible(true);
-                String esQueryJson = JSONUtils.getESQueryJson(importsInLines);
-                String esResultJson = ESUtils.getESResultJson(esQueryJson, esURL + BETTERDOCS_SEARCH);
+                String esQueryJson = jsonUtils.getESQueryJson(importsInLines, windowObjects.getSize());
+                String esResultJson = esUtils.getESResultJson(esQueryJson, windowObjects.getEsURL() + BETTERDOCS_SEARCH);
 
                 if (!esResultJson.equals(EMPTY_ES_URL)) {
-                    Map<String, String> fileTokensMap = ESUtils.getFileTokens(esResultJson);
+                    Map<String, String> fileTokensMap = esUtils.getFileTokens(esResultJson);
                     Map<String, ArrayList<CodeInfo>> projectNodes = new HashMap<String, ArrayList<CodeInfo>>();
 
-                    ProjectTree.updateProjectNodes(imports, fileTokensMap, projectNodes);
-                    ProjectTree.updateRoot(root, projectNodes);
+                    projectTree.updateProjectNodes(imports, fileTokensMap, projectNodes);
+                    projectTree.updateRoot(root, projectNodes);
 
                     model.reload(root);
-                    jTree.addTreeSelectionListener(ProjectTree.getTreeSelectionListener(root));
+                    jTree.addTreeSelectionListener(new ProjectTree().getTreeSelectionListener(root));
                 } else {
                     Messages.showInfoMessage(EMPTY_ES_URL, INFO);
                 }
             } else {
                 jTree.updateUI();
             }
+        } else {
+            Messages.showMessageDialog(EDITOR_ERROR, INFO, Messages.getErrorIcon());
         }
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
     }
 }

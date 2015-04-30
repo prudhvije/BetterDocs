@@ -47,9 +47,12 @@ public class ESUtils {
     private static final String IDEA_PLUGIN = "Idea-Plugin";
     private static final String UTF_8 = "UTF-8";
 
-    public static String getContentsForFile(String file) {
-        String esFileQueryJson = JSONUtils.getJsonForFileContent(file);
-        String esFileResultJson = getESResultJson(esFileQueryJson, RefreshAction.esURL + SOURCEFILE_SEARCH);
+    private static WindowObjects windowObjects = WindowObjects.getInstance();
+    private JSONUtils jsonUtils = new JSONUtils();
+
+    public String getContentsForFile(String file) {
+        String esFileQueryJson = jsonUtils.getJsonForFileContent(file);
+        String esFileResultJson = getESResultJson(esFileQueryJson, windowObjects.getEsURL() + SOURCEFILE_SEARCH);
         JsonArray hitsArray = getJsonElements(esFileResultJson);
 
         JsonObject hitObject = hitsArray.get(0).getAsJsonObject();
@@ -59,7 +62,7 @@ public class ESUtils {
         return fileContent;
     }
 
-    public static Map<String, String> getFileTokens(String esResultJson) {
+    public Map<String, String> getFileTokens(String esResultJson) {
         Map<String, String> fileTokenMap = new HashMap<String, String>();
         JsonArray hitsArray = getJsonElements(esResultJson);
 
@@ -73,7 +76,7 @@ public class ESUtils {
         return fileTokenMap;
     }
 
-    private static JsonArray getJsonElements(String esResultJson) {
+    protected JsonArray getJsonElements(String esResultJson) {
         JsonReader reader = new JsonReader(new StringReader(esResultJson));
         reader.setLenient(true);
         JsonElement jsonElement = new JsonParser().parse(reader);
@@ -83,7 +86,7 @@ public class ESUtils {
     }
 
 
-    public static String getESResultJson(String esQueryJson, String url) {
+    public String getESResultJson(String esQueryJson, String url) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             HttpClient httpClient = new DefaultHttpClient();

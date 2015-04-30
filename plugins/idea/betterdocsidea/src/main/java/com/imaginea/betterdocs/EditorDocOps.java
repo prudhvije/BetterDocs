@@ -26,7 +26,7 @@ public class EditorDocOps {
     private static final String IMPORT = "import ";
     public static final char DOT = '.';
 
-    public static Set<String> importsInLines(Iterable<String> lines, Iterable<String> imports) {
+    public Set<String> importsInLines(Iterable<String> lines, Iterable<String> imports) {
         Set<String> importsInLines = new HashSet<String>();
 
         for (String line : lines) {
@@ -39,24 +39,23 @@ public class EditorDocOps {
         return importsInLines;
     }
 
-    public static Set<String> getLines(Editor projectEditor) {
+    public Set<String> getLines(Editor projectEditor, int distance) {
         Set<String> lines = new HashSet<String>();
         Document document = projectEditor.getDocument();
-        int startLine;
-        int endLine;
-        int distance = RefreshAction.distance;
+        int head;
+        int tail;
 
         if (projectEditor.getSelectionModel().hasSelection()) {
-            startLine = document.getLineNumber(projectEditor.getSelectionModel().getSelectionStart());
-            endLine = document.getLineNumber(projectEditor.getSelectionModel().getSelectionEnd());
+            head = document.getLineNumber(projectEditor.getSelectionModel().getSelectionStart());
+            tail = document.getLineNumber(projectEditor.getSelectionModel().getSelectionEnd());
         } else {
             int currentLine = document.getLineNumber(projectEditor.getCaretModel().getOffset());
-            startLine = currentLine - distance >= 0 ? currentLine - distance : 0;
-            endLine = currentLine + distance <= document.getLineCount() - 1 ? currentLine + distance : document.getLineCount() - 1;
+            head = currentLine - distance >= 0 ? currentLine - distance : 0;
+            tail = currentLine + distance <= document.getLineCount() - 1 ? currentLine + distance : document.getLineCount() - 1;
         }
 
-        for (int i = startLine; i <= endLine; i++) {
-            String line = document.getCharsSequence().subSequence(document.getLineStartOffset(i), document.getLineEndOffset(i)).toString();
+        for (int j = head; j <= tail; j++) {
+            String line = document.getCharsSequence().subSequence(document.getLineStartOffset(j), document.getLineEndOffset(j)).toString();
             if (!line.contains(IMPORT)) {
                 lines.add(line);
             }
@@ -64,7 +63,7 @@ public class EditorDocOps {
         return lines;
     }
 
-    public static Set<String> getImports(Document document) {
+    public Set<String> getImports(Document document) {
         int startLine = 0;
         int endLine = document.getLineCount() - 1;
         Set<String> imports = new HashSet<String>();

@@ -31,35 +31,40 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 public class ProjectTree {
-    public static TreeSelectionListener getTreeSelectionListener(final TreeNode root) {
+    private WindowObjects windowObjects = WindowObjects.getInstance();
+    private WindowEditorOps windowEditorOps = new WindowEditorOps();
+    private ESUtils esUtils = new ESUtils();
+    private JSONUtils jsonUtils = new JSONUtils();
+
+    public TreeSelectionListener getTreeSelectionListener(final TreeNode root) {
         return new TreeSelectionListener() {
             @Override
             public void valueChanged(TreeSelectionEvent treeSelectionEvent) {
                 DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)
-                        RefreshAction.jTree.getLastSelectedPathComponent();
+                        windowObjects.getjTree().getLastSelectedPathComponent();
 
                 if (selectedNode != null && selectedNode.isLeaf() && root.getChildCount() > 0) {
                     final CodeInfo codeInfo = (CodeInfo) selectedNode.getUserObject();
-                    final Document windowEditorDocument = RefreshAction.windowEditor.getDocument();
+                    final Document windowEditorDocument = windowObjects.getWindowEditor().getDocument();
 
-                    WindowEditorOps.writeToDocument(codeInfo, windowEditorDocument);
+                    windowEditorOps.writeToDocument(codeInfo, windowEditorDocument);
 
                     final List<Integer> linesForFolding = codeInfo.getLineNumbers();
                     linesForFolding.add(windowEditorDocument.getLineCount() + 1);
                     java.util.Collections.sort(linesForFolding);
-                    WindowEditorOps.addFoldings(windowEditorDocument, linesForFolding);
+                    windowEditorOps.addFoldings(windowEditorDocument, linesForFolding);
                 }
             }
         };
     }
 
-    public static void updateProjectNodes(Collection<String> imports, Map<String, String> fileTokensMap, Map<String, ArrayList<CodeInfo>> projectNodes) {
+    public void updateProjectNodes(Collection<String> imports, Map<String, String> fileTokensMap, Map<String, ArrayList<CodeInfo>> projectNodes) {
         for (Map.Entry<String, String> entry : fileTokensMap.entrySet()) {
             String fileName = entry.getKey();
             String tokens = entry.getValue();
 
-            List<Integer> lineNumbers = JSONUtils.getLineNumbers(imports, tokens);
-            String contents = ESUtils.getContentsForFile(fileName);
+            List<Integer> lineNumbers = jsonUtils.getLineNumbers(imports, tokens);
+            String contents = esUtils.getContentsForFile(fileName);
             CodeInfo codeInfo = new CodeInfo(fileName, lineNumbers, contents);
 
             //Taking projectName as name till 2nd '/'
@@ -76,14 +81,14 @@ public class ProjectTree {
         }
     }
 
-    public static DefaultMutableTreeNode updateRoot(DefaultMutableTreeNode root, Map<String, ArrayList<CodeInfo>> projectNodes) {
+    public DefaultMutableTreeNode updateRoot(DefaultMutableTreeNode root, Map<String, ArrayList<CodeInfo>> projectNodes) {
         for (Map.Entry<String, ArrayList<CodeInfo>> entry : projectNodes.entrySet()) {
-            root.add(getNodes(entry.getKey(), entry.getValue()));
+            root.add(this.getNodes(entry.getKey(), entry.getValue()));
         }
         return root;
     }
 
-    private static MutableTreeNode getNodes(String projectName, Iterable<CodeInfo> codeInfoCollection) {
+    protected MutableTreeNode getNodes(String projectName, Iterable<CodeInfo> codeInfoCollection) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(projectName);
         Collection<String> fileNameSet = new HashSet<String>();
         for (CodeInfo codeInfo : codeInfoCollection) {

@@ -17,6 +17,8 @@
 
 package com.imaginea.betterdocs;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.editor.Document;
@@ -24,7 +26,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.JBColor;
@@ -39,15 +40,16 @@ import javax.swing.JSplitPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-public class MainWindow implements ToolWindowFactory {
+public class MainWindow implements ToolWindowFactory, Disposable {
 
     private static final String PREF_PREF_GROW = "pref, pref:grow";
     private static final String PREF_PREF = "pref";
     private static final String PROJECTS = "Projects";
+    private Editor windowEditor;
 
     @Override
     public void createToolWindowContent(Project project, ToolWindow toolWindow) {
-        toolWindow.setIcon(Messages.getInformationIcon());
+        toolWindow.setIcon(AllIcons.Toolwindows.Documentation);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(PROJECTS);
 
         JTree jTree = new JTree(root);
@@ -56,11 +58,13 @@ public class MainWindow implements ToolWindowFactory {
         jTree.setForeground(new JBColor(new Color(100, 155, 155), new Color(100, 155, 155)));
 
         Document document = EditorFactory.getInstance().createDocument("");
-        Editor windowEditor = EditorFactory.getInstance().createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension("java"), false);
+        windowEditor = EditorFactory.getInstance().createEditor(document, project, FileTypeManager.getInstance().getFileTypeByExtension("java"), false);
 
         RefreshAction action = new RefreshAction();
-        action.setTree(jTree);
-        action.setWindowEditor(windowEditor);
+        WindowObjects windowObjects = WindowObjects.getInstance();
+
+        windowObjects.setTree(jTree);
+        windowObjects.setWindowEditor(windowEditor);
 
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(action);
@@ -95,5 +99,12 @@ public class MainWindow implements ToolWindowFactory {
         toggleAction.setjSplitPane(jSplitPane);
 
         toolWindow.getComponent().getParent().add(jSplitPane);
+    }
+
+    @Override
+    public void dispose() {
+        if (windowEditor != null) {
+            EditorFactory.getInstance().releaseEditor(windowEditor);
+        }
     }
 }
