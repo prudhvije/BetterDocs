@@ -47,6 +47,9 @@ public class ProjectTree {
                     final CodeInfo codeInfo = (CodeInfo) selectedNode.getUserObject();
                     final Document windowEditorDocument = windowObjects.getWindowEditor().
                                                                         getDocument();
+                    final String fileName = codeInfo.getFileName();
+                    final String fileContents = esUtils.getContentsForFile(fileName);
+                    codeInfo.setContents(fileContents);
 
                     windowEditorOps.writeToDocument(codeInfo, windowEditorDocument);
 
@@ -67,8 +70,7 @@ public class ProjectTree {
             String tokens = entry.getValue();
 
             List<Integer> lineNumbers = jsonUtils.getLineNumbers(imports, tokens);
-            String contents = esUtils.getContentsForFile(fileName);
-            CodeInfo codeInfo = new CodeInfo(fileName, lineNumbers, contents);
+            CodeInfo codeInfo = new CodeInfo(fileName, lineNumbers);
 
             //Taking projectName as name till 2nd '/'
             int startIndex = fileName.indexOf('/');
