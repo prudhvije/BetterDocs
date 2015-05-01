@@ -40,9 +40,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 public class MainWindow implements ToolWindowFactory, Disposable {
 
-    private static final String PREF_PREF_GROW = "pref, pref:grow";
-    private static final String PREF_PREF = "pref";
+    private static final String COLUMN_SPECS = "pref, pref:grow";
+    private static final String ROW_SPECS = "pref";
     private static final String PROJECTS = "Projects";
+    private static final String JAVA = "java";
     private Editor windowEditor;
 
     @Override
@@ -57,7 +58,7 @@ public class MainWindow implements ToolWindowFactory, Disposable {
         Document document = EditorFactory.getInstance().createDocument("");
         windowEditor = EditorFactory.getInstance().
                         createEditor(document, project, FileTypeManager.getInstance().
-                                getFileTypeByExtension("java"), false);
+                                getFileTypeByExtension(JAVA), false);
 
         RefreshAction action = new RefreshAction();
         WindowObjects windowObjects = WindowObjects.getInstance();
@@ -72,8 +73,8 @@ public class MainWindow implements ToolWindowFactory, Disposable {
                                             getComponent();
 
         FormLayout layout = new FormLayout(
-                PREF_PREF_GROW,
-                PREF_PREF);
+                COLUMN_SPECS,
+                ROW_SPECS);
 
         CellConstraints cc = new CellConstraints();
 
