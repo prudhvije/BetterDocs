@@ -46,6 +46,7 @@ public class ESUtils {
     private static final String USER_AGENT = "USER-AGENT";
     private static final String IDEA_PLUGIN = "Idea-Plugin";
     private static final String UTF_8 = "UTF-8";
+    private static final int HTTP_OK_STATUS = 200;
 
     private static WindowObjects windowObjects = WindowObjects.getInstance();
     private JSONUtils jsonUtils = new JSONUtils();
@@ -99,7 +100,7 @@ public class ESUtils {
             getRequest.setHeader(USER_AGENT, IDEA_PLUGIN);
 
             HttpResponse response = httpClient.execute(getRequest);
-            if (response.getStatusLine().getStatusCode() != 200) {
+            if (response.getStatusLine().getStatusCode() != HTTP_OK_STATUS) {
                 throw new RuntimeException(FAILED_HTTP_ERROR_CODE + url
                         + response.getStatusLine().getStatusCode());
             }

@@ -21,7 +21,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import javax.swing.JTree;
 
-public class WindowObjects {
+public final class WindowObjects {
     private static WindowObjects windowObjects = new WindowObjects();
 
     private Project project;
@@ -35,48 +35,48 @@ public class WindowObjects {
 
     }
 
-    public void setProject(final Project project) {
-        this.project = project;
+    public void setProject(final Project pproject) {
+        this.project = pproject;
     }
 
     public Project getProject() {
         return project;
     }
 
-    public void setTree(final JTree jTree) {
-        this.jTree = jTree;
+    public void setTree(final JTree pjTree) {
+        this.jTree = pjTree;
     }
 
     public JTree getjTree() {
         return jTree;
     }
 
-    public void setWindowEditor(final Editor windowEditor) {
-        this.windowEditor = windowEditor;
+    public void setWindowEditor(final Editor pwindowEditor) {
+        this.windowEditor = pwindowEditor;
     }
 
     public Editor getWindowEditor() {
         return windowEditor;
     }
 
-    public void setDistance(final int distance) {
-        this.distance = distance;
+    public void setDistance(final int pdistance) {
+        this.distance = pdistance;
     }
 
     public int getDistance() {
         return distance;
     }
 
-    public void setSize(final int size) {
-        this.size = size;
+    public void setSize(final int psize) {
+        this.size = psize;
     }
 
     public int getSize() {
         return size;
     }
 
-    public void setEsURL(final String esURL) {
-        this.esURL = esURL;
+    public void setEsURL(final String pesURL) {
+        this.esURL = pesURL;
     }
 
     public String getEsURL() {

@@ -36,10 +36,11 @@ public class CodeInfo {
         return fileName;
     }
 
-    public CodeInfo(final String fileName, final List<Integer> lineNumbers, final String contents) {
-        this.fileName = fileName;
-        this.lineNumbers = lineNumbers;
-        this.contents = contents;
+    public CodeInfo(final String pfileName, final List<Integer> plineNumbers,
+                    final String pcontents) {
+        this.fileName = pfileName;
+        this.lineNumbers = plineNumbers;
+        this.contents = pcontents;
     }
 
     public final String toString() {

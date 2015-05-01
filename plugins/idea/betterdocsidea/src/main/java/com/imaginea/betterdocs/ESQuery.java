@@ -44,8 +44,8 @@ public class ESQuery {
     public static class Query {
         private Bool bool;
 
-        public final void setBool(final Bool bool) {
-            this.bool = bool;
+        public final void setBool(final Bool pbool) {
+            this.bool = pbool;
         }
 
         public final Bool getBool() {
@@ -58,16 +58,16 @@ public class ESQuery {
         private List<Must> mustNot;
         private List<Must> should;
 
-        public final void setMust(final List<Must> must) {
-            this.must = must;
+        public final void setMust(final List<Must> pmust) {
+            this.must = pmust;
         }
 
-        public final void setMustNot(final List<Must> mustNot) {
-            this.mustNot = mustNot;
+        public final void setMustNot(final List<Must> pmustNot) {
+            this.mustNot = pmustNot;
         }
 
-        public final void setShould(final List<Must> should) {
-            this.should = should;
+        public final void setShould(final List<Must> pshould) {
+            this.should = pshould;
         }
 
         public final List<Must> getMust() {
@@ -86,8 +86,8 @@ public class ESQuery {
     public static class Must {
         private Term term;
 
-        public final void setTerm(final Term term) {
-            this.term = term;
+        public final void setTerm(final Term pterm) {
+            this.term = pterm;
         }
 
         public final Term getTerm() {
@@ -98,8 +98,8 @@ public class ESQuery {
     public static class Term {
         private String importName;
 
-        public final void setImportName(final String importName) {
-            this.importName = importName;
+        public final void setImportName(final String pimportName) {
+            this.importName = pimportName;
         }
 
         public final String getImportName() {
@@ -110,8 +110,8 @@ public class ESQuery {
     public static class Sort {
         private Score score;
 
-        public final void setScore(final Score score) {
-            this.score = score;
+        public final void setScore(final Score pscore) {
+            this.score = pscore;
         }
 
         public final Score getScore() {
@@ -122,8 +122,8 @@ public class ESQuery {
     public static class Score {
         private String order;
 
-        public final void setOrder(final String order) {
-            this.order = order;
+        public final void setOrder(final String porder) {
+            this.order = porder;
         }
 
         public final String getOrder() {
@@ -131,19 +131,19 @@ public class ESQuery {
         }
     }
 
-    public final void setQuery(final Query query) {
-        this.query = query;
+    public final void setQuery(final Query pquery) {
+        this.query = pquery;
     }
 
-    public final void setFrom(final int from) {
-        this.from = from;
+    public final void setFrom(final int pfrom) {
+        this.from = pfrom;
     }
 
-    public final void setSize(final int size) {
-        this.size = size;
+    public final void setSize(final int psize) {
+        this.size = psize;
     }
 
-    public final void setSort(final List<Sort> sort) {
-        this.sort = sort;
+    public final void setSort(final List<Sort> psort) {
+        this.sort = psort;
     }
 }

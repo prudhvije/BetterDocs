@@ -27,8 +27,8 @@ public class ESFileContent {
     public static class Query {
         private Term term;
 
-        public final void setTerm(final Term term) {
-            this.term = term;
+        public final void setTerm(final Term pterm) {
+            this.term = pterm;
         }
 
         public final Term getTerm() {
@@ -39,8 +39,8 @@ public class ESFileContent {
     public static class Term {
         private String fileName;
 
-        public final void setFileName(final String fileName) {
-            this.fileName = fileName;
+        public final void setFileName(final String pfileName) {
+            this.fileName = pfileName;
         }
 
         public final String getFileName() {
@@ -48,7 +48,7 @@ public class ESFileContent {
         }
     }
 
-    public final void setQuery(final Query query) {
-        this.query = query;
+    public final void setQuery(final Query pquery) {
+        this.query = pquery;
     }
 }

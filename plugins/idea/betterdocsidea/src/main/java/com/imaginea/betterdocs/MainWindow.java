@@ -29,9 +29,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.treeStructure.Tree;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
-import java.awt.Dimension;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -44,6 +44,7 @@ public class MainWindow implements ToolWindowFactory, Disposable {
     private static final String ROW_SPECS = "pref";
     private static final String PROJECTS = "Projects";
     private static final String JAVA = "java";
+    private static final double DIVIDER_LOCATION = 0.5;
     private Editor windowEditor;
 
     @Override
@@ -51,7 +52,7 @@ public class MainWindow implements ToolWindowFactory, Disposable {
         toolWindow.setIcon(AllIcons.Toolwindows.Documentation);
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(PROJECTS);
 
-        JTree jTree = new JTree(root);
+        JTree jTree = new Tree(root);
         jTree.setVisible(false);
         jTree.setAutoscrolls(true);
 
@@ -81,7 +82,6 @@ public class MainWindow implements ToolWindowFactory, Disposable {
         JBScrollPane jTreeScrollPane = new JBScrollPane();
         jTreeScrollPane.setViewportView(jTree);
         jTreeScrollPane.setAutoscrolls(true);
-        jTreeScrollPane.setPreferredSize(new Dimension(200, 300));
 
         JPanel jPanel = new JPanel(layout);
         jPanel.setVisible(true);
@@ -91,8 +91,9 @@ public class MainWindow implements ToolWindowFactory, Disposable {
         JBScrollPane jbScrollPane = new JBScrollPane();
         jbScrollPane.setViewportView(windowEditor.getComponent());
 
-        final JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, jbScrollPane, jPanel);
-        jSplitPane.setDividerLocation(0.5);
+        final JSplitPane jSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                                                        jbScrollPane, jPanel);
+        jSplitPane.setDividerLocation(DIVIDER_LOCATION);
 
         toolWindow.getComponent().getParent().add(jSplitPane);
     }

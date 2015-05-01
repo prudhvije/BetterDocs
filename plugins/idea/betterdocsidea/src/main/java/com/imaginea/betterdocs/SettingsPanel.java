@@ -19,7 +19,6 @@ package com.imaginea.betterdocs;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.FormLayout;
 import javax.swing.JComponent;
@@ -50,7 +49,7 @@ public class SettingsPanel implements Configurable {
     @Nullable
     @Override
     public final String getHelpTopic() {
-        // TODO: Provide URL for HelpTopic in JetBrains website about plugin
+        //Need to provide URL for plugin in JetBrain's website
         return "";
     }
 
