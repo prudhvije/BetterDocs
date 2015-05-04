@@ -48,7 +48,7 @@ public class RefreshAction extends AnAction {
     protected static final String ES_URL_DEFAULT = "http://labs.imaginea.com/betterdocs";
     protected static final int DISTANCE_DEFAULT_VALUE = 10;
     protected static final int SIZE_DEFAULT_VALUE = 30;
-    private static final String EDITOR_ERROR = "Could not get editor any active editor";
+    private static final String EDITOR_ERROR = "Could not get any active editor";
     private static final String INFO = "info";
     private static final String FORMAT = "%s %s %s";
     private static final String QUERYING = "Querying";
