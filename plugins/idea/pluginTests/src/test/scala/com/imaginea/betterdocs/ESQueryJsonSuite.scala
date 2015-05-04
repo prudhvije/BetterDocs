@@ -30,15 +30,15 @@ class ESQueryJsonSuite extends FunSuite with BeforeAndAfterAll{
     val size = 10
     val actualJSON = new JSONUtils().getESQueryJson(imortsSet, size)
     val expectedJSON = "{\"query\":{\"bool\":{\"must\":[" +
-      "{\"term\":{\"custom.tokens.importName\":\"java.util.Map\"}}],\"" +
-      "mustNot\":[],\"should\":[]}},\"from\":0,\"size\":10,\"sort\":" +
-      "[{\"score\":{\"order\":\"desc\"}}]}"
+      "{\"term\":{\"custom.tokens.importName\":\"java.util.Map\"}}]," +
+      "\"mustNot\":[],\"should\":[]}},\"from\":0,\"size\":10," +
+      "\"sort\":[{\"score\":{\"order\":\"desc\"}}]}"
 
     assert(actualJSON == expectedJSON)
   }
 
-  private val fileName = "apache/ofbiz/blob/trunk/framework/entity/src" +
-    "/org/ofbiz/entity/model/ModelEntity.java"
+  private val fileName = "apache/ofbiz/blob/trunk/framework/" +
+    "entity/src/org/ofbiz/entity/model/ModelEntity.java"
 
   test("actual file content json should match with expectedJSON") {
     val expectedFileContentJSON = new JSONUtils().getJsonForFileContent(fileName)
