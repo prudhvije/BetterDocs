@@ -21,8 +21,10 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 public class EditorDocOps {
+    private WindowObjects windowObjects = WindowObjects.getInstance();
     private static final String IMPORT = "import ";
     public static final char DOT = '.';
 
@@ -31,18 +33,26 @@ public class EditorDocOps {
         Set<String> importsInLines = new HashSet<String>();
 
         for (String line : lines) {
-            for (String nextImport : imports) {
-                if (line.contains(nextImport.substring(nextImport.lastIndexOf(DOT) + 1))) {
-                    importsInLines.add(nextImport);
+            StringTokenizer stringTokenizer = new StringTokenizer(line);
+            while (stringTokenizer.hasMoreTokens()) {
+                String token = stringTokenizer.nextToken();
+                for (String nextImport : imports) {
+                    String shortImportName = nextImport.substring(nextImport.lastIndexOf(DOT) + 1);
+                    if (token.equals(shortImportName)) {
+                        importsInLines.add(nextImport);
+                    }
                 }
             }
         }
         return importsInLines;
     }
 
-    public final Set<String> getLines(final Editor projectEditor, final int distance) {
+    public final Set<String> getLines(final Editor projectEditor) {
         Set<String> lines = new HashSet<String>();
         Document document = projectEditor.getDocument();
+        String regex = "\"\"\"(\\s*(import|private|public|protected|\\/?\\*|//).*)"
+                        + "|\\\".*\\\"\"\"\"";
+        int distance = windowObjects.getDistance();
         int head = 0;
         int tail = document.getLineCount() - 1;
 
@@ -65,8 +75,10 @@ public class EditorDocOps {
             String line = document.getCharsSequence().
                                     subSequence(document.getLineStartOffset(j),
                                                     document.getLineEndOffset(j)).toString();
-            if (!line.contains(IMPORT)) {
-                lines.add(line);
+            String cleanedLine = line.replaceFirst(regex, "")
+                    .replaceAll("\\W+", " ").trim();
+            if (!cleanedLine.startsWith(IMPORT)) {
+                lines.add(cleanedLine);
             }
         }
         return lines;
@@ -80,8 +92,8 @@ public class EditorDocOps {
             int lineStart = document.getLineStartOffset(i);
             int lineEnd = document.getLineEndOffset(i) + document.getLineSeparatorLength(i);
             String line = document.getCharsSequence().
-                                    subSequence(lineStart, lineEnd).toString();
-            if (line.contains(IMPORT) && !line.contains("*")) {
+                    subSequence(lineStart, lineEnd).toString();
+            if (line.startsWith(IMPORT) && !line.contains("*")) {
                 imports.add(line.replace(IMPORT, "").replace(";", "").trim());
             }
         }

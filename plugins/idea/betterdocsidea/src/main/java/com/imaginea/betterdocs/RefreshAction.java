@@ -97,7 +97,7 @@ public class RefreshAction extends AnAction {
             JTree jTree = windowObjects.getjTree();
 
             Set<String> imports = editorDocOps.getImports(projectEditor.getDocument());
-            Set<String> lines = editorDocOps.getLines(projectEditor, windowObjects.getDistance());
+            Set<String> lines = editorDocOps.getLines(projectEditor);
             Set<String> importsInLines = editorDocOps.importsInLines(lines, imports);
 
             DefaultTreeModel model = (DefaultTreeModel) jTree.getModel();
