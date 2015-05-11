@@ -17,7 +17,14 @@
 
 package com.imaginea.betterdocs;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +46,8 @@ public class ProjectTree {
     private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private ESUtils esUtils = new ESUtils();
     private JSONUtils jsonUtils = new JSONUtils();
+    private EditorDocOps editorDocOps = new EditorDocOps();
+
 
     public final TreeSelectionListener getTreeSelectionListener(final TreeNode root) {
         return new TreeSelectionListener() {
@@ -71,6 +80,18 @@ public class ProjectTree {
                     linesForFolding.add(windowEditorDocument.getLineCount() + 1);
                     java.util.Collections.sort(linesForFolding);
                     windowEditorOps.addFoldings(windowEditorDocument, linesForFolding);
+                    VirtualFile virtualFile = editorDocOps.getVirtualFile(codeInfo);
+                    PsiFile psiFile =
+                            PsiManager.getInstance(windowObjects.getProject()).
+                                        findFile(virtualFile);
+                    DaemonCodeAnalyzer.getInstance(windowObjects.getProject()).
+                                        setHighlightingEnabled(psiFile, true);
+                    FileEditorManager.getInstance(windowObjects.getProject()).
+                                        openFile(virtualFile, true, true);
+                    Document document =
+                            EditorFactory.getInstance().createDocument(codeInfo.getContents());
+                    editorDocOps.addHighlighting(linesForFolding, document);
+                    editorDocOps.gotoLine(linesForFolding.get(0), document);
                 }
             }
         };
@@ -137,8 +158,7 @@ class ToolTipTreeCellRenderer implements TreeCellRenderer {
                                                   final boolean hasFocus) {
         renderer.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
 
-        if (value != null) {
-            if (value instanceof DefaultMutableTreeNode) {
+        if (value != null && value instanceof DefaultMutableTreeNode) {
                 if (!((DefaultMutableTreeNode) value).isLeaf()
                         && !((DefaultMutableTreeNode) value).isRoot()) {
                     String repoName = ((DefaultMutableTreeNode) value).getUserObject().toString();
@@ -155,7 +175,6 @@ class ToolTipTreeCellRenderer implements TreeCellRenderer {
                 } else {
                     renderer.setToolTipText(null);
                 }
-            }
         }
         return renderer;
     }
