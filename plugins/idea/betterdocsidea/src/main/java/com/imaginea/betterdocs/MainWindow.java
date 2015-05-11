@@ -54,6 +54,7 @@ public class MainWindow implements ToolWindowFactory, Disposable {
     private static final int EDITOR_SCROLL_PANE_WIDTH = 200;
     private static final int EDITOR_SCROLL_PANE_HEIGHT = 300;
     private static final String BETTERDOCS = "BetterDocs";
+    private static final int UNIT_INCREMENT = 16;
     private Editor windowEditor;
 
     @Override
@@ -112,6 +113,7 @@ public class MainWindow implements ToolWindowFactory, Disposable {
         editorScrollPane.setAutoscrolls(true);
         editorScrollPane.setPreferredSize(new Dimension(EDITOR_SCROLL_PANE_WIDTH,
                 EDITOR_SCROLL_PANE_HEIGHT));
+        editorScrollPane.getVerticalScrollBar().setUnitIncrement(UNIT_INCREMENT);
 
         windowObjects.setPanel(editorPanel);
 
