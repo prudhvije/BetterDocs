@@ -32,7 +32,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-
+import java.awt.FlowLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,12 +42,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-
 import javax.swing.tree.TreeCellRenderer;
 import org.jetbrains.annotations.NotNull;
 
@@ -67,6 +67,8 @@ public class RefreshAction extends AnAction {
     private static final String QUERYING = "Querying";
     private static final String FOR = "for";
     protected static final String EXCLUDE_IMPORT_LIST = "Exclude imports";
+    private static final String REPO_STARS = "Repo Stars";
+    private static final String BANNER_FORMAT = "%s %s %s %s";
 
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private ProjectTree projectTree = new ProjectTree();
@@ -204,10 +206,17 @@ public class RefreshAction extends AnAction {
             List<Integer> lineNumbersList = new ArrayList<Integer>(lineNumbersSet);
             Collections.sort(lineNumbersList);
 
+            //Storing the prev line Numbers for displaying as blocks
+            int prev = lineNumbersList.get(0);
+
             for (int line : lineNumbersList) {
                 //Document is 0 indexed
                 line = line - 1;
                 if (line < tinyEditorDoc.getLineCount() - 1) {
+                    if (prev != line - 1) {
+                        stringBuilder.append(System.lineSeparator());
+                        prev = line;
+                    }
                     int startOffset = tinyEditorDoc.getLineStartOffset(line);
                     int endOffset = tinyEditorDoc.getLineEndOffset(line)
                             + tinyEditorDoc.getLineSeparatorLength(line);
@@ -219,11 +228,13 @@ public class RefreshAction extends AnAction {
                 }
             }
 
-            createEditor(editorPanel, stringBuilder.toString());
+            createEditor(editorPanel, codeInfo.toString(), codeInfo.getFileName(),
+                    stringBuilder.toString());
         }
     }
 
-    private void createEditor(final JPanel editorPanel, final String contents) {
+    private void createEditor(final JPanel editorPanel, final String displayFileName,
+                              final String fileName, final String contents) {
         Document tinyEditorDoc;
         tinyEditorDoc =
                 EditorFactory.getInstance().createDocument(contents);
@@ -235,6 +246,30 @@ public class RefreshAction extends AnAction {
         Editor tinyEditor =
                 EditorFactory.getInstance().
                         createEditor(tinyEditorDoc, project, fileType, false);
+
+        JPanel expandPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        int startIndex = fileName.indexOf('/');
+        int endIndex = fileName.indexOf('/', startIndex + 1);
+
+        String projectName = fileName.substring(0, endIndex);
+
+        int repoId = windowObjects.getRepoNameIdMap().get(projectName);
+        String stars;
+        if (windowObjects.getRepoStarsMap().containsKey(projectName)) {
+            stars = windowObjects.getRepoStarsMap().get(projectName).toString();
+        } else {
+            String repoStarsJson = jsonUtils.getRepoStarsJSON(repoId);
+            stars = esUtils.getRepoStars(repoStarsJson);
+            windowObjects.getRepoStarsMap().put(projectName, stars);
+        }
+
+        expandPanel.add(new JLabel(String.format(BANNER_FORMAT,
+                displayFileName, projectName, REPO_STARS, stars)));
+        expandPanel.revalidate();
+        expandPanel.repaint();
+
+        editorPanel.add(expandPanel);
 
         editorPanel.add(tinyEditor.getComponent());
         editorPanel.revalidate();

@@ -17,11 +17,22 @@
 
 package com.imaginea.betterdocs;
 
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.openapi.editor.SelectionModel;
+import com.intellij.openapi.editor.markup.EffectType;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.MarkupModel;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaDirectoryService;
 import com.intellij.psi.PsiDirectory;
@@ -31,8 +42,14 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.ui.JBColor;
 import com.intellij.util.containers.ContainerUtil;
-
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,10 +58,12 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import org.jetbrains.annotations.NotNull;
 
 public class EditorDocOps {
+    private WindowObjects windowObjects = WindowObjects.getInstance();
+    private static final String JAVA_IO_TMP_DIR = "java.io.tmpdir";
+    private static final Color HIGHLIGHTING_COLOR = new Color(255, 250, 205);
     public static final char DOT = '.';
     private static final String IMPORT_LIST = "IMPORT_LIST";
     private static final String IMPORT_STATEMENT = "IMPORT_STATEMENT";
@@ -201,7 +220,7 @@ public class EditorDocOps {
     public final Set<String> excludeConfiguredImports(final Set<String> imports,
             final String excludeImport) {
         Set<String> excludeImports = getExcludeImports(excludeImport);
-        Set<String> excludedImports = new HashSet<>();
+        Set<String> excludedImports = new HashSet<String>();
         imports.removeAll(excludeImports);
         excludedImports.addAll(imports);
         for (String importStatement : excludeImports) {
@@ -232,5 +251,87 @@ public class EditorDocOps {
             }
         }
         return excludeImports;
+    }
+
+    public final VirtualFile getVirtualFile(final String fileName, final String contents) {
+        String tempDir = System.getProperty(JAVA_IO_TMP_DIR);
+        String filePath = tempDir + "/" + fileName;
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        try {
+            BufferedWriter bufferedWriter =
+                    new BufferedWriter(
+                            new OutputStreamWriter(new FileOutputStream(file), ESUtils.UTF_8));
+            bufferedWriter.write(contents);
+            bufferedWriter.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        file.deleteOnExit();
+        VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+        return virtualFile;
+    }
+
+    public final void addHighlighting(final List<Integer> linesForHighlighting,
+                                      final Document document) {
+        TextAttributes attributes = new TextAttributes();
+        JBColor color = JBColor.GREEN;
+        attributes.setEffectColor(color);
+        attributes.setEffectType(EffectType.SEARCH_MATCH);
+        attributes.setBackgroundColor(HIGHLIGHTING_COLOR);
+
+        Editor projectEditor =
+                FileEditorManager.getInstance(windowObjects.getProject()).getSelectedTextEditor();
+        if (projectEditor != null) {
+            MarkupModel markupModel = projectEditor.getMarkupModel();
+            if (markupModel != null) {
+                markupModel.removeAllHighlighters();
+
+                for (int line : linesForHighlighting) {
+                    line = line - 1;
+                    if (line < document.getLineCount()) {
+                        int startOffset = document.getLineStartOffset(line);
+                        int endOffset = document.getLineEndOffset(line);
+                        String lineText =
+                                document.getCharsSequence().
+                                        subSequence(startOffset, endOffset).toString();
+                        int lineStartOffset = lineText.length() - lineText.trim().length();
+                        markupModel.addRangeHighlighter(document.getLineStartOffset(line)
+                                        + lineStartOffset,
+                                document.getLineEndOffset(line),
+                                HighlighterLayer.SELECTION,
+                                attributes,
+                                HighlighterTargetArea.EXACT_RANGE);
+                    }
+                }
+            }
+        }
+    }
+
+    public final void gotoLine(int lineNumber, final Document document) {
+        Editor projectEditor =
+                FileEditorManager.getInstance(windowObjects.getProject()).getSelectedTextEditor();
+
+        if (projectEditor != null) {
+            CaretModel caretModel = projectEditor.getCaretModel();
+
+            //document is 0-indexed
+            if (lineNumber > document.getLineCount()) {
+                lineNumber = document.getLineCount() - 1;
+            } else {
+                lineNumber = lineNumber - 1;
+            }
+
+            caretModel.moveToLogicalPosition(new LogicalPosition(lineNumber, 0));
+
+            ScrollingModel scrollingModel = projectEditor.getScrollingModel();
+            scrollingModel.scrollToCaret(ScrollType.CENTER);
+        }
     }
 }
