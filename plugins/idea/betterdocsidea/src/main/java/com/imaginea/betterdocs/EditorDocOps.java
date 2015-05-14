@@ -62,6 +62,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class EditorDocOps {
     private WindowObjects windowObjects = WindowObjects.getInstance();
+    private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private static final String JAVA_IO_TMP_DIR = "java.io.tmpdir";
     private static final Color HIGHLIGHTING_COLOR = new Color(255, 250, 205);
     public static final char DOT = '.';
@@ -263,6 +264,9 @@ public class EditorDocOps {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        } else {
+            VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+            windowEditorOps.setWriteStatus(virtualFile, true);
         }
         try {
             BufferedWriter bufferedWriter =
@@ -275,6 +279,7 @@ public class EditorDocOps {
         }
         file.deleteOnExit();
         VirtualFile virtualFile = LocalFileSystem.getInstance().findFileByPath(filePath);
+        windowEditorOps.setWriteStatus(virtualFile, false);
         return virtualFile;
     }
 

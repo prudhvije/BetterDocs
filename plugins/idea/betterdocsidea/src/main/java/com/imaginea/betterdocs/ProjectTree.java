@@ -88,7 +88,6 @@ public class ProjectTree {
                     VirtualFile virtualFile =
                             editorDocOps.getVirtualFile(codeInfo.toString(),
                                                         codeInfo.getContents());
-
                     FileEditorManager.getInstance(windowObjects.getProject()).
                             openFile(virtualFile, true, true);
                     Document document =
