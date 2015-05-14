@@ -32,7 +32,12 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
+import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +47,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -68,7 +74,9 @@ public class RefreshAction extends AnAction {
     private static final String FOR = "for";
     protected static final String EXCLUDE_IMPORT_LIST = "Exclude imports";
     private static final String REPO_STARS = "Repo Stars";
-    private static final String BANNER_FORMAT = "%s %s %s %s";
+    private static final String BANNER_FORMAT = "%s %s %s";
+    private static final String HTML_U = "<html><u>";
+    private static final String U_HTML = "</u></html>";
 
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private ProjectTree projectTree = new ProjectTree();
@@ -103,6 +111,7 @@ public class RefreshAction extends AnAction {
 
         if (projectEditor != null) {
             windowObjects.getFileNameContentsMap().clear();
+            windowObjects.getFileNameNumbersMap().clear();
             JTree jTree = windowObjects.getjTree();
 
             Set<String> imports = editorDocOps.getImports(projectEditor.getDocument(), project);
@@ -264,8 +273,33 @@ public class RefreshAction extends AnAction {
             windowObjects.getRepoStarsMap().put(projectName, stars);
         }
 
-        expandPanel.add(new JLabel(String.format(BANNER_FORMAT,
-                displayFileName, projectName, REPO_STARS, stars)));
+        JLabel infoLabel = new JLabel(String.format(BANNER_FORMAT,
+                projectName, REPO_STARS, stars));
+        JButton expandButton = new JButton();
+        expandButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, infoLabel.getMinimumSize().height));
+        //expandButton.setPreferredSize(new Dimension(Integer.MAX_VALUE, infoLabel.getMinimumSize().height));
+        expandButton.setBorderPainted(false);
+        expandButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        expandButton.setText(String.format(BANNER_FORMAT, HTML_U, displayFileName , U_HTML));
+        expandButton.setActionCommand(fileName);
+
+        expandButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JButton jButton = (JButton) e.getSource();
+                VirtualFile virtualFile = editorDocOps.getVirtualFile(displayFileName, windowObjects.getFileNameContentsMap().get(jButton.getActionCommand()));
+                FileEditorManager.getInstance(windowObjects.getProject()).
+                        openFile(virtualFile, true, true);
+                Document document =
+                        EditorFactory.getInstance().createDocument(windowObjects.getFileNameContentsMap().get(jButton.getActionCommand()));
+                editorDocOps.addHighlighting(windowObjects.getFileNameNumbersMap().get(jButton.getActionCommand()), document);
+                editorDocOps.gotoLine(windowObjects.getFileNameNumbersMap().get(jButton.getActionCommand()).get(0), document);
+            }
+        });
+
+        expandPanel.add(expandButton);
+        expandPanel.add(infoLabel);
+        expandPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, expandButton.getMinimumSize().height));
         expandPanel.revalidate();
         expandPanel.repaint();
 

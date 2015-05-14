@@ -20,6 +20,7 @@ package com.imaginea.betterdocs;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -34,6 +35,7 @@ public final class WindowObjects {
     private int size;
     private String esURL;
     private Map<String, String> fileNameContentsMap = new HashMap<String, String>();
+    private Map<String, List<Integer>> fileNameNumbersMap = new HashMap<String, List<Integer>>();
     private Map<String, String> repoStarsMap = new HashMap<String, String>();
     private Map<String, Integer> repoNameIdMap = new HashMap<String, Integer>();
 
@@ -121,6 +123,14 @@ public final class WindowObjects {
 
     public JPanel getEditorPanel() {
         return editorPanel;
+    }
+
+    public Map<String, List<Integer>> getFileNameNumbersMap() {
+        return fileNameNumbersMap;
+    }
+
+    public void setFileNameNumbersMap(final Map<String, List<Integer>> pFileNameNumbersMap) {
+        this.fileNameNumbersMap = pFileNameNumbersMap;
     }
 
 }

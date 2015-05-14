@@ -46,6 +46,7 @@ import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
 public class ProjectTree {
+    private static final String OPEN_IN_NEW_TAB = "Open in New Tab";
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private ESUtils esUtils = new ESUtils();
@@ -85,15 +86,6 @@ public class ProjectTree {
                     linesForFolding.add(windowEditorDocument.getLineCount() + 1);
                     java.util.Collections.sort(linesForFolding);
                     windowEditorOps.addFoldings(windowEditorDocument, linesForFolding);
-                    VirtualFile virtualFile =
-                            editorDocOps.getVirtualFile(codeInfo.toString(),
-                                                        codeInfo.getContents());
-                    FileEditorManager.getInstance(windowObjects.getProject()).
-                            openFile(virtualFile, true, true);
-                    Document document =
-                            EditorFactory.getInstance().createDocument(codeInfo.getContents());
-                    editorDocOps.addHighlighting(linesForFolding, document);
-                    editorDocOps.gotoLine(linesForFolding.get(0), document);
                 }
             }
         };
@@ -105,8 +97,14 @@ public class ProjectTree {
         for (Map.Entry<String, String> entry : fileTokensMap.entrySet()) {
             String fileName = entry.getKey();
             String tokens = entry.getValue();
+            List<Integer> lineNumbers;
 
-            List<Integer> lineNumbers = jsonUtils.getLineNumbers(imports, tokens);
+            if (!windowObjects.getFileNameNumbersMap().containsKey(fileName)) {
+                lineNumbers = jsonUtils.getLineNumbers(imports, tokens);
+                windowObjects.getFileNameNumbersMap().put(fileName, lineNumbers);
+            } else {
+                lineNumbers = windowObjects.getFileNameNumbersMap().get(fileName);
+            }
             CodeInfo codeInfo = new CodeInfo(fileName, lineNumbers);
 
             //Taking projectName as name till 2nd '/'
@@ -163,6 +161,26 @@ public class ProjectTree {
                     }
                     final String gitUrl = url;
                     JPopupMenu menu = new JPopupMenu();
+
+                    if (selectedNode.isLeaf()) {
+                        final CodeInfo codeInfo = (CodeInfo) selectedNode.getUserObject();
+
+                        menu.add(new JMenuItem(new AbstractAction() {
+                            @Override
+                            public void actionPerformed(final ActionEvent actionEvent) {
+                                VirtualFile virtualFile =
+                                        editorDocOps.getVirtualFile(codeInfo.toString(),
+                                                codeInfo.getContents());
+                                FileEditorManager.getInstance(windowObjects.getProject()).
+                                        openFile(virtualFile, true, true);
+                                Document document =
+                                        EditorFactory.getInstance().createDocument(codeInfo.getContents());
+                                editorDocOps.addHighlighting(codeInfo.getLineNumbers(), document);
+                                editorDocOps.gotoLine(codeInfo.getLineNumbers().get(0), document);
+                            }
+                        })).setText(OPEN_IN_NEW_TAB);
+                    }
+
                     menu.add(new JMenuItem(new AbstractAction() {
                         @Override
                         public void actionPerformed(final ActionEvent actionEvent) {
@@ -171,6 +189,7 @@ public class ProjectTree {
                             }
                         }
                     })).setText(RIGHT_CLICK_MENU_ITEM_TEXT);
+
                     menu.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
                 }
             }
