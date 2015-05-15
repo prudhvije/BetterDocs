@@ -31,17 +31,13 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
-
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,7 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -58,13 +53,13 @@ import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
-
 import org.jetbrains.annotations.NotNull;
 
 public class RefreshAction extends AnAction {
     private static final String BETTER_DOCS = "BetterDocs";
-    protected static final String EMPTY_ES_URL = "Please set/modify proper esURL in idea settings";
+    protected static final String EMPTY_ES_URL =
+            "<html>Elastic Search URL <br> %s <br> in idea settings is incorrect.<br> See "
+                    + "<img src='" + AllIcons.General.Settings + "'></html>";
     protected static final String ES_URL = "esURL";
     protected static final String DISTANCE = "distance";
     protected static final String SIZE = "size";
@@ -73,7 +68,6 @@ public class RefreshAction extends AnAction {
     protected static final int DISTANCE_DEFAULT_VALUE = 10;
     protected static final int SIZE_DEFAULT_VALUE = 30;
     private static final String EDITOR_ERROR = "Could not get any active editor";
-    private static final String INFO = "info";
     private static final String FORMAT = "%s %s %s";
     private static final String QUERYING = "Querying";
     private static final String FOR = "for";
@@ -89,6 +83,7 @@ public class RefreshAction extends AnAction {
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private ProjectTree projectTree = new ProjectTree();
     private EditorDocOps editorDocOps = new EditorDocOps();
+    private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private ESUtils esUtils = new ESUtils();
     private JSONUtils jsonUtils = new JSONUtils();
     private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
@@ -175,7 +170,7 @@ public class RefreshAction extends AnAction {
                         showHelpInfo(HELP_MESSAGE);
                     }
                 } else {
-                    showHelpInfo(EMPTY_ES_URL);
+                    showHelpInfo(String.format(EMPTY_ES_URL, windowObjects.getEsURL()));
                 }
             } else {
                 showHelpInfo(HELP_MESSAGE);
@@ -186,7 +181,7 @@ public class RefreshAction extends AnAction {
         }
     }
 
-    private void showHelpInfo(String info) {
+    private void showHelpInfo(final String info) {
         windowObjects.getjTreeScrollPane().setViewportView(new JLabel(info));
     }
 
@@ -225,37 +220,11 @@ public class RefreshAction extends AnAction {
                 windowObjects.getFileNameContentsMap().put(fileName, fileContents);
             }
 
-            Document tinyEditorDoc = EditorFactory.getInstance().
-                    createDocument(fileContents);
-            StringBuilder stringBuilder = new StringBuilder();
-            Set<Integer> lineNumbersSet = new HashSet<Integer>(codeInfo.getLineNumbers());
-            List<Integer> lineNumbersList = new ArrayList<Integer>(lineNumbersSet);
-            Collections.sort(lineNumbersList);
-
-            //Storing the prev line Numbers for displaying as blocks
-            int prev = lineNumbersList.get(0);
-
-            for (int line : lineNumbersList) {
-                //Document is 0 indexed
-                line = line - 1;
-                if (line < tinyEditorDoc.getLineCount() - 1) {
-                    if (prev != line - 1) {
-                        stringBuilder.append(System.lineSeparator());
-                        prev = line;
-                    }
-                    int startOffset = tinyEditorDoc.getLineStartOffset(line);
-                    int endOffset = tinyEditorDoc.getLineEndOffset(line)
-                            + tinyEditorDoc.getLineSeparatorLength(line);
-                    String code = tinyEditorDoc.getCharsSequence().
-                            subSequence(startOffset, endOffset).
-                            toString().trim()
-                            + System.lineSeparator();
-                    stringBuilder.append(code);
-                }
-            }
+            String contentsInLines =
+                    editorDocOps.getContentsInLines(fileContents, codeInfo.getLineNumbers());
 
             createEditor(editorPanel, codeInfo.toString(), codeInfo.getFileName(),
-                    stringBuilder.toString());
+                            contentsInLines);
         }
     }
 
@@ -272,29 +241,19 @@ public class RefreshAction extends AnAction {
         Editor tinyEditor =
                 EditorFactory.getInstance().
                         createEditor(tinyEditorDoc, project, fileType, false);
+        windowEditorOps.releaseEditor(project, tinyEditor);
 
         JPanel expandPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        int startIndex = fileName.indexOf('/');
-        int endIndex = fileName.indexOf('/', startIndex + 1);
-
-        String projectName = fileName.substring(0, endIndex);
+        String projectName = esUtils.getProjectName(fileName);
 
         int repoId = windowObjects.getRepoNameIdMap().get(projectName);
-        String stars;
-        if (windowObjects.getRepoStarsMap().containsKey(projectName)) {
-            stars = windowObjects.getRepoStarsMap().get(projectName).toString();
-        } else {
-            String repoStarsJson = jsonUtils.getRepoStarsJSON(repoId);
-            stars = esUtils.getRepoStars(repoStarsJson);
-            windowObjects.getRepoStarsMap().put(projectName, stars);
-        }
-
+        String stars = esUtils.extractRepoStars(projectName, repoId);
         JLabel infoLabel = new JLabel(String.format(BANNER_FORMAT,
                 projectName, REPO_STARS, stars));
         JButton expandButton = new JButton();
-        expandButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, infoLabel.getMinimumSize().height));
-        //expandButton.setPreferredSize(new Dimension(Integer.MAX_VALUE, infoLabel.getMinimumSize().height));
+        expandButton.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, infoLabel.getMinimumSize().height));
         expandButton.setBorderPainted(false);
         expandButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         expandButton.setText(String.format(BANNER_FORMAT, HTML_U, displayFileName , U_HTML));
@@ -302,21 +261,32 @@ public class RefreshAction extends AnAction {
 
         expandButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 JButton jButton = (JButton) e.getSource();
-                VirtualFile virtualFile = editorDocOps.getVirtualFile(displayFileName, windowObjects.getFileNameContentsMap().get(jButton.getActionCommand()));
+                VirtualFile virtualFile =
+                        editorDocOps.getVirtualFile(displayFileName,
+                                windowObjects.getFileNameContentsMap().
+                                        get(jButton.getActionCommand()));
                 FileEditorManager.getInstance(windowObjects.getProject()).
                         openFile(virtualFile, true, true);
                 Document document =
-                        EditorFactory.getInstance().createDocument(windowObjects.getFileNameContentsMap().get(jButton.getActionCommand()));
-                editorDocOps.addHighlighting(windowObjects.getFileNameNumbersMap().get(jButton.getActionCommand()), document);
-                editorDocOps.gotoLine(windowObjects.getFileNameNumbersMap().get(jButton.getActionCommand()).get(0), document);
+                        EditorFactory.getInstance().
+                                createDocument(windowObjects.
+                                                getFileNameContentsMap().
+                                                get(jButton.getActionCommand()));
+                editorDocOps.addHighlighting(
+                        windowObjects.
+                                getFileNameNumbersMap().get(jButton.getActionCommand()), document);
+                editorDocOps.
+                        gotoLine(windowObjects.getFileNameNumbersMap().
+                                        get(jButton.getActionCommand()).get(0), document);
             }
         });
 
         expandPanel.add(expandButton);
         expandPanel.add(infoLabel);
-        expandPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, expandButton.getMinimumSize().height));
+        expandPanel.setMaximumSize(
+                new Dimension(Integer.MAX_VALUE, expandButton.getMinimumSize().height));
         expandPanel.revalidate();
         expandPanel.repaint();
 
