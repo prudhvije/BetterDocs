@@ -63,6 +63,7 @@ public class MainWindow implements ToolWindowFactory {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode(PROJECTS);
 
         JTree jTree = new Tree(root);
+        jTree.setRootVisible(false);
         jTree.setAutoscrolls(true);
 
         Document document = EditorFactory.getInstance().createDocument("");
