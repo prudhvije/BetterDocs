@@ -50,7 +50,9 @@ import org.jetbrains.annotations.NotNull;
 
 public class RefreshAction extends AnAction {
     private static final String BETTER_DOCS = "BetterDocs";
-    protected static final String EMPTY_ES_URL = "Please set/modify proper esURL in idea settings";
+    protected static final String EMPTY_ES_URL =
+            "<html><center>Elastic Search URL <br> %s  in idea settings is incorrect.<br> See <img src='" +
+                    AllIcons.General.Settings + "'> </center> </html>";
     protected static final String ES_URL = "esURL";
     protected static final String DISTANCE = "distance";
     protected static final String SIZE = "size";
@@ -59,7 +61,6 @@ public class RefreshAction extends AnAction {
     protected static final int DISTANCE_DEFAULT_VALUE = 10;
     protected static final int SIZE_DEFAULT_VALUE = 30;
     private static final String EDITOR_ERROR = "Could not get any active editor";
-    private static final String INFO = "info";
     private static final String FORMAT = "%s %s %s";
     private static final String QUERYING = "Querying";
     private static final String FOR = "for";
@@ -71,6 +72,7 @@ public class RefreshAction extends AnAction {
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private ProjectTree projectTree = new ProjectTree();
     private EditorDocOps editorDocOps = new EditorDocOps();
+    private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private ESUtils esUtils = new ESUtils();
     private JSONUtils jsonUtils = new JSONUtils();
     private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
@@ -206,29 +208,10 @@ public class RefreshAction extends AnAction {
                 windowObjects.getFileNameContentsMap().put(fileName, fileContents);
             }
 
-            Document tinyEditorDoc = EditorFactory.getInstance().
-                    createDocument(fileContents);
-            StringBuilder stringBuilder = new StringBuilder();
-            Set<Integer> lineNumbersSet = new HashSet<Integer>(codeInfo.getLineNumbers());
-            List<Integer> lineNumbersList = new ArrayList<Integer>(lineNumbersSet);
-            Collections.sort(lineNumbersList);
+            String contentsInLines =
+                    editorDocOps.getContentInLines(fileContents, codeInfo.getLineNumbers());
 
-            for (int line : lineNumbersList) {
-                //Document is 0 indexed
-                line = line - 1;
-                if (line < tinyEditorDoc.getLineCount() - 1) {
-                    int startOffset = tinyEditorDoc.getLineStartOffset(line);
-                    int endOffset = tinyEditorDoc.getLineEndOffset(line)
-                            + tinyEditorDoc.getLineSeparatorLength(line);
-                    String code = tinyEditorDoc.getCharsSequence().
-                            subSequence(startOffset, endOffset).
-                            toString().trim()
-                            + System.lineSeparator();
-                    stringBuilder.append(code);
-                }
-            }
-
-            createEditor(editorPanel, stringBuilder.toString());
+            createEditor(editorPanel, contentsInLines);
         }
     }
 
@@ -244,6 +227,7 @@ public class RefreshAction extends AnAction {
         Editor tinyEditor =
                 EditorFactory.getInstance().
                         createEditor(tinyEditorDoc, project, fileType, false);
+        windowEditorOps.releaseEditor(project, tinyEditor);
 
         editorPanel.add(tinyEditor.getComponent());
         editorPanel.revalidate();

@@ -20,6 +20,7 @@ package com.imaginea.betterdocs;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.editor.Document;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -46,6 +47,7 @@ public class ProjectTree {
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private ESUtils esUtils = new ESUtils();
+    private EditorDocOps editorDocOps = new EditorDocOps();
     private JSONUtils jsonUtils = new JSONUtils();
     private static final String GITHUB_LINK = "https://github.com/";
     private static final String RIGHT_CLICK_MENU_ITEM_TEXT = "Go to GitHub";
@@ -74,13 +76,9 @@ public class ProjectTree {
                     }
 
                     codeInfo.setContents(fileContents);
+                    String contentsInLines = editorDocOps.getContentInLines(fileContents, codeInfo.getLineNumbers());
+                    windowEditorOps.writeToDocument(contentsInLines, windowEditorDocument);
 
-                    windowEditorOps.writeToDocument(codeInfo, windowEditorDocument);
-
-                    final List<Integer> linesForFolding = codeInfo.getLineNumbers();
-                    linesForFolding.add(windowEditorDocument.getLineCount() + 1);
-                    java.util.Collections.sort(linesForFolding);
-                    windowEditorOps.addFoldings(windowEditorDocument, linesForFolding);
                 }
             }
         };
