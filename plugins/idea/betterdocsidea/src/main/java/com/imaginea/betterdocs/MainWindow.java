@@ -82,8 +82,10 @@ public class MainWindow implements ToolWindowFactory {
 
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(refreshAction);
+        group.addSeparator();
         group.add(expandProjectTreeAction);
         group.add(collapseProjectTreeAction);
+        group.addSeparator();
         group.add(editSettingsAction);
         JComponent toolBar = ActionManager.getInstance().
                 createActionToolbar(BETTERDOCS, group, true).
