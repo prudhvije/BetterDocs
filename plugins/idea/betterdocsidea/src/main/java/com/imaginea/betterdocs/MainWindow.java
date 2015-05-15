@@ -93,6 +93,7 @@ public class MainWindow implements ToolWindowFactory {
 
 
         JBScrollPane jTreeScrollPane = new JBScrollPane();
+        jTreeScrollPane.getViewport().setBackground(JBColor.white);
         jTreeScrollPane.setViewportView(new JLabel(RefreshAction.HELP_MESSAGE));
         jTreeScrollPane.setAutoscrolls(true);
         jTreeScrollPane.setBackground(JBColor.white);
@@ -106,9 +107,12 @@ public class MainWindow implements ToolWindowFactory {
         jSplitPane.setDividerLocation(DIVIDER_LOCATION);
 
         JPanel editorPanel = new JPanel();
+        editorPanel.setOpaque(true);
+        editorPanel.setBackground(JBColor.white);
         editorPanel.setLayout(new BoxLayout(editorPanel, BoxLayout.Y_AXIS));
 
         final JBScrollPane editorScrollPane = new JBScrollPane();
+        editorScrollPane.getViewport().setBackground(JBColor.white);
         editorScrollPane.setViewportView(editorPanel);
         editorScrollPane.setAutoscrolls(true);
         editorScrollPane.setPreferredSize(new Dimension(EDITOR_SCROLL_PANE_WIDTH,
