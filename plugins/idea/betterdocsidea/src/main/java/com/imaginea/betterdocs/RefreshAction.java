@@ -59,6 +59,7 @@ import java.util.concurrent.TimeoutException;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -99,6 +100,11 @@ public class RefreshAction extends AnAction {
     private ESUtils esUtils = new ESUtils();
     private JSONUtils jsonUtils = new JSONUtils();
     private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
+    private JTabbedPane jTabbedPane;
+
+    public void setJTabbedPane(JTabbedPane pJTabbedPane) {
+        this.jTabbedPane = pJTabbedPane;
+    }
 
     public RefreshAction() {
         super(BETTER_DOCS, BETTER_DOCS, AllIcons.Actions.Refresh);
@@ -168,6 +174,8 @@ public class RefreshAction extends AnAction {
         try {
             if (!projectNodes.get(TIMEOUT, TimeUnit.SECONDS).isEmpty()) {
                 setProjectNodes(jTree, model, root, projectNodes);
+                //1 is index of CodePane in JTabbed Pane
+                jTabbedPane.setSelectedIndex(1);
             } else {
                 showHelpInfo(HELP_MESSAGE);
                 jTree.updateUI();
