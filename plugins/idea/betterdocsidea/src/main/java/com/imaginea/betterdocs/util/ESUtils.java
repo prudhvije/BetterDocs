@@ -34,10 +34,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 
 public class ESUtils {
     private static final String FILE_CONTENT = "fileContent";
@@ -123,28 +121,27 @@ public class ESUtils {
     public final String getESResultJson(final String esQueryJson, final String url) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
-            HttpClient httpClient = new DefaultHttpClient();
+            HttpClient httpClient = new HttpClient();
             String encodedJson = URLEncoder.encode(esQueryJson, UTF_8);
             String esGetURL = url + encodedJson;
 
-            HttpGet getRequest = new HttpGet(esGetURL);
-            getRequest.setHeader(USER_AGENT, IDEA_PLUGIN);
+            GetMethod getMethod = new GetMethod(esGetURL);
+            getMethod.addRequestHeader(USER_AGENT, IDEA_PLUGIN);
 
-            HttpResponse response = httpClient.execute(getRequest);
-            if (response.getStatusLine().getStatusCode() != HTTP_OK_STATUS) {
+            int responseCode = httpClient.executeMethod(getMethod);
+            if (responseCode != HTTP_OK_STATUS) {
                 throw new RuntimeException(FAILED_HTTP_ERROR
-                        + response.getStatusLine().getStatusCode() + "  "
-                        + response.getStatusLine().getReasonPhrase());
+                        + getMethod.getStatusCode() + " "
+                        + getMethod.getStatusText());
             }
 
             BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent()), UTF_8));
+                    new InputStreamReader(getMethod.getResponseBodyAsStream(), UTF_8));
             String output;
             while ((output = bufferedReader.readLine()) != null) {
                 stringBuilder.append(output);
             }
             bufferedReader.close();
-            httpClient.getConnectionManager().shutdown();
         } catch (IllegalStateException e) {
             e.printStackTrace();
             return RefreshAction.EMPTY_ES_URL;
