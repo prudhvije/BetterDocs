@@ -108,8 +108,6 @@
 1. Open Betterdocs plugin, select code from any non java file and hit refresh action.
 2. No NullPointerException after closing the plugin in idea.log/console.
 
-#135
-
 #### 18. [ideaplugin] Add UUID to request context and settins panel.
 ##### fixes <a href='https://github.com/Imaginea/BetterDocs/issues/168'> #168 </a>
 1. Open Betterdocs plugin, click on settings and check the generated plugin ID.
@@ -127,3 +125,29 @@
 <img src='screenshots/soft_wrap.png'/>
 3. Check the featured pane tiny editors, try to resizing them.Tiny editors should honor intellij soft wrap.
 <img src='screenshots/126.png'/>
+
+#### 21. [idea] #191 Added icon to plugin tool window in plugin.xml instead of setting it in MainWindow
+##### fixes <a href='https://github.com/Imaginea/BetterDocs/issues/191'> #191 </a>
+1. BetterDocs idea plugin should have icon even before you invoke it.<br>
+<img src='screenshots/toolWindowIcon.png'/>
+
+#### 22. [idea] #153 Added license agreement for using betterdocs for first time
+##### fixes <a href='https://github.com/Imaginea/BetterDocs/issues/153'> #153 </a>
+1. Using BetterDocs for the first time should produce a Legal Notice dialog.
+2. It should have two options "Accept" and "Decline"
+3. On clicking "Accept" that dialog should disappear and allows you to use better docs.
+4. On clicking "Decline" IDE should restart and betterdocs is disabled.<br>
+<img src='screenshots/legalNotice.png'/>
+
+#### 23. [idea] #180 clearing all pane preview editor before every new request
+##### fixes <a href='https://github.com/Imaginea/BetterDocs/issues/180> #180 </a>
+1. After every new request(clicking refresh action button) contents of main window preview editor should be cleared.<br>
+<img src='screenshots/clearMainPanePreviewEditor.png'/>
+
+#### 24. [idea] #83 added keyboard shortcut to plugin
+##### fixes <a href='https://github.com/Imaginea/BetterDocs/issues/83> #83 </a>
+1. BetterDocs idea plugin can be shown/hidden by hitting "alt" + 8
+
+#### 25. [idea] #50 results will be updated on opening plugin window 
+##### fixes <a href='https://github.com/Imaginea/BetterDocs/issues/50> #50 </a>
+1. Every time plugin is opened(if previously it's hidden) results get automatically refreshed.
