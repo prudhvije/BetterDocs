@@ -24,16 +24,20 @@ import com.imaginea.betterdocs.action.ExpandProjectTreeAction;
 import com.imaginea.betterdocs.action.RefreshAction;
 import com.imaginea.betterdocs.object.WindowObjects;
 
+import com.intellij.ide.actions.ActivateToolWindowAction;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
@@ -49,6 +53,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class MainWindow implements ToolWindowFactory {
@@ -66,6 +71,8 @@ public class MainWindow implements ToolWindowFactory {
     private static final String OS_NAME = "os.name";
     private static final String OS_VERSION = "os.version";
     private static final int UNIT_INCREMENT = 16;
+    private static final String ALT = "alt ";
+    private static final int NUM_KEY = 8;
     private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private WindowObjects windowObjects = WindowObjects.getInstance();
 
@@ -83,6 +90,14 @@ public class MainWindow implements ToolWindowFactory {
         Editor windowEditor = EditorFactory.getInstance().
                 createEditor(document, project, FileTypeManager.getInstance().
                         getFileTypeByExtension(JAVA), false);
+
+        Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
+        if (keymap != null) {
+            KeyboardShortcut defShortcut =
+                    new KeyboardShortcut(KeyStroke.getKeyStroke(ALT + NUM_KEY), null);
+            String actionId = ActivateToolWindowAction.getActionIdForToolWindow(BETTERDOCS);
+            keymap.addShortcut(actionId, defShortcut);
+        }
 
         RefreshAction refreshAction = new RefreshAction();
         EditSettingsAction editSettingsAction = new EditSettingsAction();
