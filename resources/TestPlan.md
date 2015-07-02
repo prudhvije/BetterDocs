@@ -196,3 +196,8 @@ these values can't be applied.<br>
 2. Type in a value greater than 30 for featured count.
 3. Results will be fetched without a Bad Request or Bad Gateway error.
 4. Verify the count of fetched results is same as expected.
+
+#### 31. [idea] #104 Add line markers for #56
+##### fixes <a href='https://github.com/Imaginea/KodeBeagle/issues/104'> #104 </a>
+1. After opening the results file in new tab in editor you should see markers on the vertical markup bar of editor.<br>
+<img src = 'screenshots/line-markers.png'/><br>
