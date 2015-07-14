@@ -43,7 +43,7 @@ object SparkIndexJobHelper {
 
   def makeZipFileExtractedRDD(sc: SparkContext):
   RDD[(List[(String, String)], Option[Repository], List[String], Statistics)] = {
-    val zipFileNameRDD = sc.binaryFiles(KodeBeagleConfig.githubDir).map { case (zipFile, stream) =>
+    val zipFileNameRDD = sc.binaryFiles(KodeBeagleConfig.githubDir, 60000).map { case (zipFile, stream) =>
       (zipFile.stripPrefix("file:").stripPrefix("hdfs:"), stream)
     }
     val zipFileExtractedRDD = zipFileNameRDD.map { case (zipFileName, stream) =>

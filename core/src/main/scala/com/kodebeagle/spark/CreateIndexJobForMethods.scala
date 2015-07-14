@@ -31,7 +31,7 @@ object CreateIndexJobForMethods  {
     val conf = new SparkConf()
       .setMaster(KodeBeagleConfig.sparkMaster)
       .setAppName("CreateIndexJobForMethods")
-      .set("spark.executor.memory", "2g")
+      .set("spark.executor.memory", "12g")
 
     val sc: SparkContext = createSparkContext(conf)
 

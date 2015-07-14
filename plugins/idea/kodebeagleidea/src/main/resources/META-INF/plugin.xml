@@ -1,7 +1,7 @@
 <idea-plugin version="3">
   <id>kodebeagleidea</id>
   <name>Kode Beagle</name>
-  <version>VERSION_STRING</version> <!-- This gets auto updated by SBT during package -->
+  <version>0.1.0-15-g47dbd32</version> <!-- This gets auto updated by SBT during package -->
 
   <vendor email="kodebeagle@googlegroups.com" url="http://imaginea.com/">Imaginea</vendor>
 
@@ -31,7 +31,7 @@
     ]]></description>
 
   <change-notes><![CDATA[
-    See milestone for this version(VERSION_STRING) at: <a href="https://github.com/Imaginea/KodeBeagle/milestones">
+    See milestone for this version(0.1.0-15-g47dbd32) at: <a href="https://github.com/Imaginea/KodeBeagle/milestones">
     Milestones</a> on github.
     ]]>
   </change-notes>
@@ -54,10 +54,14 @@
   </project-components>
     <actions>
 
+      <action id="Test" class="com.imaginea.kodebeagle.action.SearchKodeBeagleAction" text="Search with Kode Beagle" icon="AllIcons.Toolwindows.Documentation">
+        <add-to-group group-id="EditorPopupMenu" anchor="before" relative-to-action="$SearchWeb"/>
+        <keyboard-shortcut keymap="$default" first-keystroke="alt 8"/>
+      </action>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Kode Beagle" icon="AllIcons.Toolwindows.Documentation" anchor="right" factoryClass="com.imaginea.kodebeagle.ui.MainWindow"/>
+       <toolWindow id="Kode Beagle" icon="AllIcons.Toolwindows.Documentation" anchor="right" factoryClass="com.imaginea.kodebeagle.ui.MainWindow"/>
         <applicationConfigurable instance="com.imaginea.kodebeagle.ui.SettingsPanel"/>
     </extensions>
 </idea-plugin>

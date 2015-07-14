@@ -105,10 +105,10 @@ object KodeBeagleBuild extends Build {
 
 object Dependencies {
 
-  val spark = "org.apache.spark" %% "spark-core" % "1.3.1" // % "provided" Provided makes it not run through sbt run.
+  val spark = "org.apache.spark" %% "spark-core" % "1.3.1"  % "provided" //Provided makes it not run through sbt run.
   val parserCombinator = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3"
   val scalaTest = "org.scalatest" %% "scalatest" % "2.2.4" % "test" 
-  val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.7.10"
+  val slf4j = "org.slf4j" % "slf4j-log4j12" % "1.7.2"
   val javaparser = "com.github.javaparser" % "javaparser-core" % "2.0.0"
   val json4s = "org.json4s" %% "json4s-ast" % "3.2.10"
   val json4sJackson = "org.json4s" %% "json4s-jackson" % "3.2.10"

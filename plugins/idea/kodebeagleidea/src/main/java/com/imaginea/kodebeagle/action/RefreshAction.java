@@ -18,14 +18,14 @@
 package com.imaginea.kodebeagle.action;
 
 import com.imaginea.kodebeagle.model.CodeInfo;
+import com.imaginea.kodebeagle.object.WindowObjects;
+import com.imaginea.kodebeagle.ui.MainWindow;
+import com.imaginea.kodebeagle.ui.ProjectTree;
 import com.imaginea.kodebeagle.ui.WrapLayout;
 import com.imaginea.kodebeagle.util.ESUtils;
 import com.imaginea.kodebeagle.util.EditorDocOps;
 import com.imaginea.kodebeagle.util.JSONUtils;
-import com.imaginea.kodebeagle.ui.MainWindow;
-import com.imaginea.kodebeagle.ui.ProjectTree;
 import com.imaginea.kodebeagle.util.WindowEditorOps;
-import com.imaginea.kodebeagle.object.WindowObjects;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
@@ -50,27 +50,17 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBColor;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-import javax.swing.ToolTipManager;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import org.jetbrains.annotations.NotNull;
 
 public class RefreshAction extends AnAction {
     private static final String KODE_BEAGLE = "KodeBeagle";
@@ -237,7 +227,7 @@ public class RefreshAction extends AnAction {
 
     private void updateMainPaneJTreeUI(final JTree jTree, final DefaultTreeModel model,
                                        final DefaultMutableTreeNode root,
-                                       final Map<String, ArrayList<CodeInfo>>  projectNodes) {
+                                       final Map<String, ArrayList<CodeInfo>> projectNodes) {
         projectTree.updateRoot(root, projectNodes);
         model.reload(root);
         jTree.addTreeSelectionListener(projectTree.getTreeSelectionListener(root));
@@ -250,7 +240,7 @@ public class RefreshAction extends AnAction {
     private String getESQueryResultJson(final Set<String> importsInLines) {
         String esQueryJson = jsonUtils.getESQueryJson(importsInLines, windowObjects.getSize());
         String esQueryResultJson =
-            esUtils.getESResultJson(esQueryJson, windowObjects.getEsURL() + KODEBEAGLE_SEARCH);
+                esUtils.getESResultJson(esQueryJson, windowObjects.getEsURL() + KODEBEAGLE_SEARCH);
         return esQueryResultJson;
     }
 
@@ -266,7 +256,7 @@ public class RefreshAction extends AnAction {
 
             String contentsInLines = editorDocOps.getContentsInLines(fileContents, lineNumbers);
             createCodePaneTinyEditor(codePaneTinyEditorsJPanel, codePaneTinyEditorInfo.toString(),
-                                     codePaneTinyEditorInfo.getFileName(), contentsInLines);
+                    codePaneTinyEditorInfo.getFileName(), contentsInLines);
         }
     }
 
@@ -333,7 +323,7 @@ public class RefreshAction extends AnAction {
     }
 
     private List<CodeInfo> getCodePaneTinyEditorsInfoList(final Map<String,
-                                                          ArrayList<CodeInfo>> projectNodes) {
+            ArrayList<CodeInfo>> projectNodes) {
         int maxEditors = maxTinyEditors;
         int count = 0;
         List<CodeInfo> codePaneTinyEditors = new ArrayList<CodeInfo>();
@@ -497,7 +487,7 @@ public class RefreshAction extends AnAction {
                                 esUtils.getTotalHitsCount(), timeToFetchResults);
                 notification =
                         getNotification(notificationTitle, notificationContent,
-                                        NotificationType.INFORMATION);
+                                NotificationType.INFORMATION);
                 Notifications.Bus.notify(notification);
             } catch (RuntimeException rte) {
                 rte.printStackTrace();
@@ -507,11 +497,10 @@ public class RefreshAction extends AnAction {
         }
 
         private String getResultNotificationMessage(final int resultCount, final long totalCount,
-                                                    final double timeToFetchResults)
-        {
+                                                    final double timeToFetchResults) {
             String resultNotification =
                     importsInLines.toString() + String.format(RESULT_NOTIFICATION_FORMAT,
-                                    resultCount, totalCount, timeToFetchResults);
+                            resultCount, totalCount, timeToFetchResults);
             return resultNotification;
         }
 
@@ -521,7 +510,7 @@ public class RefreshAction extends AnAction {
                 if (!projectNodes.isEmpty()) {
                     try {
                         doFrontEndWork(jTree, model, root, codePaneTinyEditorsInfoList,
-                                       projectNodes);
+                                projectNodes);
                         goToFeaturedPane();
                     } catch (RuntimeException rte) {
                         rte.printStackTrace();

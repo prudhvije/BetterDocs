@@ -42,6 +42,7 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
@@ -82,6 +83,15 @@ public class MainWindow implements ToolWindowFactory {
     private WindowEditorOps windowEditorOps = new WindowEditorOps();
     private WindowObjects windowObjects = WindowObjects.getInstance();
     private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
+    private static ToolWindow toolWindow;
+
+    public ToolWindow getToolWindow() {
+        return toolWindow;
+    }
+
+    public void setToolWindow(ToolWindow toolWindow) {
+        this.toolWindow = toolWindow;
+    }
 
     @Override
     public final void createToolWindowContent(final Project project, final ToolWindow toolWindow) {
@@ -131,13 +141,14 @@ public class MainWindow implements ToolWindowFactory {
         group.add(collapseProjectTreeAction);
         group.addSeparator();
         group.add(editSettingsAction);
+
         final JComponent toolBar = ActionManager.getInstance().
                 createActionToolbar(KODEBEAGLE, group, true).
                 getComponent();
         toolBar.setBorder(BorderFactory.createCompoundBorder());
 
         toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, toolBar.getMinimumSize().height));
-        toolBar.addPropertyChangeListener(new PropertyChangeListener() {
+        /*toolBar.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(final PropertyChangeEvent evt) {
                 if (toolBar.isShowing()) {
@@ -148,7 +159,7 @@ public class MainWindow implements ToolWindowFactory {
                     }
                 }
             }
-        });
+        });*/
 
 
 
@@ -193,8 +204,8 @@ public class MainWindow implements ToolWindowFactory {
         if (!LegalNotice.isLegalNoticeAccepted()) {
             new LegalNotice(project).showLegalNotice();
         }
-
         toolWindow.getComponent().getParent().add(mainPanel);
+        setToolWindow(toolWindow);
     }
 
     private void initSystemInfo() {
