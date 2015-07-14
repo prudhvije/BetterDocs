@@ -123,7 +123,7 @@ public class RefreshAction extends AnAction {
     private ESUtils esUtils = new ESUtils();
     private JSONUtils jsonUtils = new JSONUtils();
     private PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-    private JTabbedPane jTabbedPane;
+    private static JTabbedPane jTabbedPane;
     private List<CodeInfo> codePaneTinyEditorsInfoList = new ArrayList<CodeInfo>();
     private int maxTinyEditors;
 
@@ -528,7 +528,7 @@ public class RefreshAction extends AnAction {
     }
 
     private void goToFeaturedPane() {
-        jTabbedPane.setSelectedIndex(0);
+            jTabbedPane.setSelectedIndex(0);
     }
 
     private void goToAllPane() {

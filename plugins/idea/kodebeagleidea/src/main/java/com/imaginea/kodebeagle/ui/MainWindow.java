@@ -148,20 +148,6 @@ public class MainWindow implements ToolWindowFactory {
         toolBar.setBorder(BorderFactory.createCompoundBorder());
 
         toolBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, toolBar.getMinimumSize().height));
-        /*toolBar.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(final PropertyChangeEvent evt) {
-                if (toolBar.isShowing()) {
-                    try {
-                        refreshAction.init();
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    }
-                }
-            }
-        });*/
-
-
 
         JBScrollPane jTreeScrollPane = new JBScrollPane();
         jTreeScrollPane.getViewport().setBackground(JBColor.white);
@@ -206,6 +192,12 @@ public class MainWindow implements ToolWindowFactory {
         }
         toolWindow.getComponent().getParent().add(mainPanel);
         setToolWindow(toolWindow);
+
+        try {
+            refreshAction.init();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
     }
 
     private void initSystemInfo() {
