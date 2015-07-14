@@ -194,7 +194,7 @@ public class MainWindow implements ToolWindowFactory {
         jTabbedPane.add(FEATURED_TAB, editorScrollPane);
         jTabbedPane.add(ALL_TAB, jSplitPane);
         refreshAction.setJTabbedPane(jTabbedPane);
-        // Display initial help information here.
+        // Display initial help inform    ation here.
         refreshAction.showHelpInfo(RefreshAction.HELP_MESSAGE);
         final JPanel mainPanel = new JPanel();
         mainPanel.setLayout((new BoxLayout(mainPanel, BoxLayout.Y_AXIS)));
