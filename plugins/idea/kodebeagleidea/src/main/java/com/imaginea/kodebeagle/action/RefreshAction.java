@@ -82,13 +82,17 @@ public class RefreshAction extends AnAction {
     public static final String ES_URL_DEFAULT = "http://labs.imaginea.com/kodebeagle";
     public static final int DISTANCE_DEFAULT_VALUE = 0;
     public static final int SIZE_DEFAULT_VALUE = 30;
-    private static final String EDITOR_ERROR = "Could not get any active editor";
+    public static final String EDITOR_ERROR = "Could not get any active editor";
     private static final String FORMAT = "%s %s %s";
     private static final String QUERIED = "Queried";
     private static final String FOR = "for";
     public static final String EXCLUDE_IMPORT_LIST = "Exclude imports";
     public static final String EXCLUDE_IMPORT_LIST_DEFAULT = "";
-    public static final String HELP_MESSAGE =
+    public static final String HELP_MESSAGE_IF_CODE_SELECTED =
+            "<html>Got nothing to search in selected code. To begin using, "
+                    + "<br /> please select some more code and hit <img src='"
+                    + AllIcons.Actions.Refresh + "' /> <br/> ";
+    public static final String HELP_MESSAGE_NO_SELECTED_CODE =
             "<html>Got nothing to search. To begin using, "
                     + "<br /> please select some code and hit <img src='"
                     + AllIcons.Actions.Refresh + "' /> <br/> ";
@@ -169,10 +173,18 @@ public class RefreshAction extends AnAction {
                         ProgressManager.getInstance().run(new QueryBDServerTask(importsInLines,
                                 finalImports, jTree, model, root));
                     } else {
-                        showHelpInfo(HELP_MESSAGE);
+                        if (projectEditor.getSelectionModel().hasSelection()) {
+                            showHelpInfo(HELP_MESSAGE_IF_CODE_SELECTED);
+                        } else {
+                            showHelpInfo(HELP_MESSAGE_NO_SELECTED_CODE);
+                        }
                     }
                 } else {
-                    showHelpInfo(HELP_MESSAGE);
+                    if (projectEditor.getSelectionModel().hasSelection()) {
+                        showHelpInfo(HELP_MESSAGE_IF_CODE_SELECTED);
+                    } else {
+                        showHelpInfo(HELP_MESSAGE_NO_SELECTED_CODE);
+                    }
                 }
             } else {
                 showHelpInfo(FILETYPE_HELP);
