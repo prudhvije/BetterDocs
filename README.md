@@ -47,3 +47,7 @@ If you already have intellij installed, you can skip this step.
 
 ### Step 2 Install plugin from disk
 Once jar is built goto Settings -> Plugins -> Install from disk -> Select the plugin jar built in previous step-> Restart(to use plugin)
+
+
+This project adheres to the [Open Code of Conduct][code-of-conduct]. By participating, you are expected to honor this code.
+[code-of-conduct]: http://todogroup.org/opencodeofconduct/#KodeBeagle/kodebeagle@googlegroups.com
