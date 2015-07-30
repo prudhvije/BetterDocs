@@ -278,6 +278,12 @@ Before Opt-Out mode<br>
 After Opt-Out mode <br>
 <img src = 'screenshots/after-opt-out.png'>
 lies in the limit then it will be loaded or else default values will be loaded.
+
 #### 40. [idea] #305 Fixed addition of empty import pattern while configuring imports 
 ##### fixes <a href='https://github.com/Imaginea/KodeBeagle/issues/305'> #305 </a>
 1. While adding import patterns under the configure imports section, if the user tries to add an empty string then no import is added.
+
+### 41. [idea] #302 Added CheckBox for enabling/disabling notifications and logging [ONLY UI]
+#### fixes <a href='https://github.com/Imaginea/KodeBeagle/issues/302'> #302</a>
+1. Added checkboxes for notifications and logging under the "Notifications" section.<br>
+<img src = 'screenshots/notifications-panel.png'>
